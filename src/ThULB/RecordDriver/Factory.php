@@ -51,7 +51,7 @@ class Factory
      */
    public static function getSolrMarc(ServiceManager $sm)
     {
-        $driver = new SolrVZGRecord(
+        $driver = new SolrMarc(
             $sm->getServiceLocator()->get('VuFind\Config')->get('config'),
             null,
             $sm->getServiceLocator()->get('VuFind\Config')->get('searches')

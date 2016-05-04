@@ -45,7 +45,7 @@ use VuFind\RecordDriver\SolrMarc as VuFindSolrMarc;
  * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-class SolrVZGRecord extends VuFindSolrMarc
+class SolrMarc extends VuFindSolrMarc
 {
 
     /**
