@@ -12,7 +12,7 @@ return array (
             'ils_driver' => array (
                 'factories' => array (
                     'paia' => 'ThULB\ILS\Driver\Factory::getPAIA',
-                    'paiapica' => 'ThULB\ILS\Driver\Factory::getPAIAPica',
+                    'daia' => 'ThULB\ILS\Driver\Factory::getDAIA',
                 ),
             ),
         ),
