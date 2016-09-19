@@ -9,12 +9,6 @@ return array (
                     'solrmarc' => 'ThULB\RecordDriver\Factory::getSolrMarc'
                 ),
             ),
-            'ils_driver' => array (
-                'factories' => array (
-                    'paia' => 'ThULB\ILS\Driver\Factory::getPAIA',
-                    'daia' => 'ThULB\ILS\Driver\Factory::getDAIA',
-                ),
-            ),
         ),
     ),
 );
