@@ -12,6 +12,18 @@ class PAIA extends OriginalPAIA
 {
     const DAIA_DOCUMENT_ID_PREFIX = 'http://uri.gbv.de/document/opac-de-27:';
     
+    protected function getStatusString($item)
+    {
+        $status = 'unknown';
+        if ($item['available']) {
+            $status = 'available';
+        } elseif ($item['unavailable']) {
+            $status = 'unavailable';
+        }
+        
+        return $status;
+    }
+    
     /**
      * Overrides the function in the DAIA driver class, to execute additional
      * steps.
