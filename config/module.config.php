@@ -16,4 +16,10 @@ return array (
             ),
         ),
     ),
+  'view_helpers' => array(
+      'invokables' => array(
+        'thulb_metadatahelper' => 'ThULB\View\Helper\Record\MetaDataHelper',
+        'thulb_holdinghelper' => 'ThULB\View\Helper\Record\HoldingHelper'
+      ),
+   ),
 );
