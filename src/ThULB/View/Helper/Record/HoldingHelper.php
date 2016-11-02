@@ -75,14 +75,36 @@ class HoldingHelper extends AbstractHelper
         return $availabilityString;
     }
     
-    public function getLocation(&$item)
+    public function getLocation(&$holding)
     {
-        return 'ITEM_LOCATION_PLACEHOLDER';
+        $locationText = $this->view->transEsc('location_' . $holding['location'], [], $holding['location']);
+        
+        if (isset($holding['locationhref']) && $holding['locationhref']) {
+            $locationText = '<a href="' . $holding['locationhref'] . '" target="_blank">' . $locationText . '</a>';
+        }
+        
+        return $locationText;
     }
     
-    public function getCallNumber($item)
+    public function getCallNumber($holding)
     {
-        return 'ITEM_CALLNUMBER_PLACEHOLDER';
+        $callnumberString = '';
+        
+        $callNos = $this->view->tab->getUniqueCallNumbers($holding['items']);
+        if (!empty($callNos)) {
+            foreach ($callNos as $callNo) {
+                if ($this->view->callnumberHandler) {
+                    $callnumberString .= '<a href="' . $this->view->url('alphabrowse-home') . '?source=' . $this->view->escapeHtmlAttr($this->view->callnumberHandler) . '&amp;from=' . $this->view->escapeHtmlAttr($callNo) . '">' . $this->view->escapeHtml($callNo) . '</a>';
+                } else {
+                    $callnumberString .= $this->view->escapeHtml($callNo);
+                }
+                $callnumberString .= '<br />';
+            }
+        } else {
+            $callnumberString = '&nbsp;';
+        }
+        
+        return $callnumberString;
     }
             
     public function blabberblubb($text)
