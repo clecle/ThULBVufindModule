@@ -13,8 +13,20 @@ return array (
                 'factories' => array (
                     'solrmarc' => 'ThULB\RecordDriver\Factory::getSolrMarc'
                 ),
-            ),
+            )
         ),
+        'recorddriver_tabs' => array (
+            'VuFind\RecordDriver\SolrDefault' => array (
+                'tabs' => array (
+                    'Similar' => null,
+                )
+            ),
+            'VuFind\RecordDriver\SolrMarc' => array (
+                'tabs' => array (
+                    'Similar' => null,
+                )
+            )
+        )
     ),
   'view_helpers' => array(
       'invokables' => array(
