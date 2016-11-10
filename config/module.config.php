@@ -2,6 +2,12 @@
 namespace ThULB\Module\Configuration;
 
 return array (
+    'controllers' => array (
+        'invokables'    => array (
+            'summon' => 'ThULB\Controller\SummonController',
+            'summonrecord' => 'ThULB\Controller\SummonrecordController'
+        )
+    ),
     'vufind' => array (
         'plugin_managers' => array (
             'ils_driver' => [
