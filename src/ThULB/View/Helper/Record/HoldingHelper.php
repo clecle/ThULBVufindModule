@@ -163,7 +163,61 @@ class HoldingHelper extends AbstractHelper
         return $locationText;
     }
     
-    public function getCallNumber($holding)
+    public function getCallNumber(&$item)
+    {
+      return $item[callnumber];
+    }
+    
+    public function getHoldingComments($record = null, &$item)
+    {
+      /*
+       * Exemplarbezogene Daten auslesen
+       * 
+       * Zwei Ansätze denkbar:
+       * 1. aus 980$g Marc
+       * 2. about Text der DAIA-response
+       * 
+       * Vorbedingung:
+       * 980 $2 == 31
+       * 980 $b == epn
+       * Ausgabe:
+       * 980 $g
+       * 980 $k und $l mit angeben?
+       */
+      
+
+      list($txt, $epn) = explode(":", $item[item_id]);
+
+      /*
+       * Variante 1
+       */
+      if ( is_null($record) ) {
+        $record = $this->view->driver;
+       }
+
+      //$marcRecord = $record->getMarcRecord();    
+/*
+      $allComments = $record->getFieldArray('980', ['2', 'b', 'g', 'k', 'l'], false);
+
+      foreach ($allComments as $aC) {
+        if ( $aC['2'] == $iln ) {
+          if ( $aC['b'] == $epn ) {
+            $retVal = $aC['g'];
+          }
+        }
+      }
+*/
+      /*
+       * Variante 2
+       * leider wird item > about nicht ausgeliefert > implementiert in ILS/Drive/PAIA.php
+       */
+
+      $retVal = $item['about'];
+      
+      return $retVal;
+    }
+    
+    public function getCallNumbers($holding)
     {
         $callnumberString = '';
         
