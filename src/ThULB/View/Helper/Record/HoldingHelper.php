@@ -165,7 +165,17 @@ class HoldingHelper extends AbstractHelper
     
     public function getCallNumber(&$item)
     {
-      return $item[callnumber];
+      /* 
+       * extrahiere den Standort ( der String vorm ersten : )
+       * Falls kein Doppelpunkt vorkommt, gib die Signatur unverändert weiter
+       */
+      list($standort, $callnumber) = explode(":", $item[callnumber], 2);
+      if ( $callnumber ) {
+        $retVal = $callnumber;
+      } else {
+        $retVal = $item[callnumber];
+      }
+      return $retVal;
     }
     
     public function getHoldingComments($record = null, &$item)
@@ -175,7 +185,11 @@ class HoldingHelper extends AbstractHelper
        * 
        * Zwei Ansätze denkbar:
        * 1. aus 980$g Marc
+       *  Vorteil: genauer
+       *  Nachteil: u.U. nicht aktuell
        * 2. about Text der DAIA-response
+       *  Vorteil: sofort sichtbar nach Änderung
+       *  Nachteil: nicht immer nur Pica Feld 4802? ungenau
        * 
        * Vorbedingung:
        * 980 $2 == 31
