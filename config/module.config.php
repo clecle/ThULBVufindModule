@@ -17,7 +17,8 @@ return array (
             ],
             'recorddriver' => array (
                 'factories' => array (
-                    'solrmarc' => 'ThULB\RecordDriver\Factory::getSolrMarc'
+                    'solrmarc' => 'ThULB\RecordDriver\Factory::getSolrMarc',
+                    'summon' => 'ThULB\RecordDriver\Factory::getSummon'
                 ),
             )
         ),

@@ -27,7 +27,25 @@ class Factory
         $driver->attachSearchService($sm->getServiceLocator()->get('VuFind\Search'));
         return $driver;
     }
-
-
+    
+    /**
+     * Factory for Summon record driver.
+     *
+     * @param ServiceManager $sm Service manager.
+     *
+     * @return Summon
+     */
+    public static function getSummon(\Zend\ServiceManager\ServiceManager $sm)
+    {
+        $summon = $sm->getServiceLocator()->get('VuFind\Config')->get('Summon');
+        $driver = new Summon(
+            $sm->getServiceLocator()->get('VuFind\Config')->get('config'),
+            $summon, $summon
+        );
+        $driver->setDateConverter(
+            $sm->getServiceLocator()->get('VuFind\DateConverter')
+        );
+        return $driver;
+    }
 }
 
