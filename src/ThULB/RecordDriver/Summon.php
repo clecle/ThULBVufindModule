@@ -5,7 +5,7 @@ namespace ThULB\RecordDriver;
 use \VuFind\RecordDriver\Summon as OriginalSummon;
 
 /**
- * Overwrites VuFinds standard Summon RecordDriver
+ * Overwrites and extends VuFinds standard Summon RecordDriver
  *
  * @author Richard Großer <richard.grosser@thulb.uni-jena.de>
  */
@@ -18,7 +18,7 @@ class Summon extends OriginalSummon
             return [
                 [
                     'url' => $this->fields['link'],
-                    'desc' => $this->translate('get_excerpt')
+                    'desc' => $this->translate('get_citation')
                 ]
             ];
         } else {
