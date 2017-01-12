@@ -201,6 +201,7 @@ class HoldingHelper extends AbstractHelper
       
 
       list($txt, $epn) = explode(":", $item[item_id]);
+      $retval = array();
 
       /*
        * Variante 1
@@ -216,17 +217,19 @@ class HoldingHelper extends AbstractHelper
       foreach ($allComments as $aC) {
         if ( $aC['2'] == $iln ) {
           if ( $aC['b'] == $epn ) {
-            $retVal = $aC['g'];
+            $retVal[] = $aC['g'];
           }
         }
       }
-*/
+
       /*
        * Variante 2
        * leider wird item > about nicht ausgeliefert > implementiert in ILS/Drive/PAIA.php
        */
 
-      $retVal = $item['about'];
+       if ($item['about']) {
+           $retVal[] = $item['about'];
+       }
       
       return $retVal;
     }
