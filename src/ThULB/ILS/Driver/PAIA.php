@@ -12,6 +12,8 @@ class PAIA extends OriginalPAIA
 {
     const DAIA_DOCUMENT_ID_PREFIX = 'http://uri.gbv.de/document/opac-de-27:';
     
+    const DAIA_UNKNOWN_CONTENT_VALUE = 'Unknown';
+    
     protected function getStatusString($item)
     {
         $status = 'unknown';
@@ -41,6 +43,20 @@ class PAIA extends OriginalPAIA
                     $id,
                     $this->sanitizeDaiaDocumentIds($daiaResponse)
                 );
+    }
+
+    /**
+     * Returns the value for "callnumber" in VuFind getStatus/getHolding array
+     *
+     * @param array $item Array with DAIA item data
+     *
+     * @return string
+     */
+    protected function getItemCallnumber($item)
+    {
+        return isset($item['label']) && !empty($item['label']) && strpos($item['label'], ':')
+            ? $item['label']
+            : self::DAIA_UNKNOWN_CONTENT_VALUE;
     }
     
     /**
@@ -120,8 +136,14 @@ class PAIA extends OriginalPAIA
                 $result_item['storagehref'] = $this->getItemStorageLink($item);
                 // status and availability will be calculated in own function
                 $result_item = $this->getItemStatus($item) + $result_item;
-                // add result_item to the result array
-                $result[] = $result_item;
+                // add result_item to the result array, if at least one relevant
+                // information is present
+                if ($result_item['callnumber'] !== self::DAIA_UNKNOWN_CONTENT_VALUE
+                    || $result_item['location'] !== self::DAIA_UNKNOWN_CONTENT_VALUE
+                    || $result_item['about']
+                ) {
+                    $result[] = $result_item;
+                }
             } // end iteration on item
         }
 

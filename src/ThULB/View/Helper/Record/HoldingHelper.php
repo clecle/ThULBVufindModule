@@ -169,13 +169,14 @@ class HoldingHelper extends AbstractHelper
        * extrahiere den Standort ( der String vorm ersten : )
        * Falls kein Doppelpunkt vorkommt, gib die Signatur unverändert weiter
        */
-      list($standort, $callnumber) = explode(":", $item[callnumber], 2);
+      list($standort, $callnumber) = explode(":", $item['callnumber'], 2);
       if ( $callnumber ) {
         $retVal = $callnumber;
       } else {
-        $retVal = $item[callnumber];
+        $retVal = $item['callnumber'];
       }
-      return $retVal;
+      
+      return $retVal ?: '';
     }
     
     public function getHoldingComments($record = null, &$item)
@@ -201,7 +202,7 @@ class HoldingHelper extends AbstractHelper
       
 
       list($txt, $epn) = explode(":", $item[item_id]);
-      $retval = array();
+      $retVal = array();
 
       /*
        * Variante 1
@@ -228,7 +229,7 @@ class HoldingHelper extends AbstractHelper
        */
 
        if ($item['about']) {
-           $retVal[] = $item['about'];
+           $retVal = array_merge($retVal, explode("\n", $item['about']));
        }
       
       return $retVal;
