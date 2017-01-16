@@ -17,9 +17,9 @@ class PAIA extends OriginalPAIA
     protected function getStatusString($item)
     {
         $status = 'unknown';
-        if ($item['available']) {
+        if (isset($item['available']) && $item['available']) {
             $status = 'available';
-        } elseif ($item['unavailable']) {
+        } elseif (isset($item['unavailable']) && $item['unavailable']) {
             $status = 'unavailable';
         }
         
@@ -85,6 +85,8 @@ class PAIA extends OriginalPAIA
      */
     protected function parseDaiaArray($id, $daiaArray)
     {
+        $result = [];
+        
         $doc_id = null;
         $doc_href = null;
         if (isset($daiaArray['id'])) {
