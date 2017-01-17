@@ -68,7 +68,7 @@ class Factory
         
         $searchSettings = $sm->getServiceLocator()->get('VuFind\Config')
                 ->get('searches');
-        $maxRows = $searchSettings->General->default_limit;
+        $maxRows = $searchSettings->General->result_limit;
                 
         return new Solr(
             $solr, $formatterManager, rtrim($cacheDir, '/') . '/hierarchy',
