@@ -10,6 +10,16 @@ return array (
     ),
     'vufind' => array (
         'plugin_managers' => array (
+            'hierarchy_treedataformatter' => [
+                'invokables' => [
+                    'json' => 'ThULB\Hierarchy\TreeDataFormatter\Json'
+                ],
+            ],
+            'hierarchy_treedatasource' => [
+                'factories' => [
+                    'solr' => 'ThULB\Hierarchy\TreeDataSource\Factory::getSolr',
+                ]
+            ],
             'ils_driver' => [
                 'factories' => [
                     'paia' => 'ThULB\ILS\Driver\Factory::getPAIA'
