@@ -60,4 +60,21 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         
         return $params;
     }
+
+    /**
+     * Get the value of whether or not this is a collection level record
+     *
+     * NOTE: \VuFind\Hierarchy\TreeDataFormatter\AbstractBase::isCollection()
+     * duplicates some of this logic.
+     *
+     * @return bool
+     */
+    public function isCollection()
+    {
+        $leader = $this->getMarcRecord()->getLeader();
+        $indicator = $leader[18];               // 19. position of LEADER
+        return parent::isCollection() || ($indicator === 'c');
+                
+        
+    }
 }
