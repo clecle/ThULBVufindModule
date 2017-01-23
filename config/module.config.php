@@ -30,17 +30,24 @@ return array (
                     'solrmarc' => 'ThULB\RecordDriver\Factory::getSolrMarc',
                     'summon' => 'ThULB\RecordDriver\Factory::getSummon'
                 ),
-            )
+            ),
+            'recordtab' => [
+                'factories' => [
+                    'articlecl' => 'ThULB\RecordTab\Factory::getArticleCollectionList'
+                ]
+            ]
         ),
         'recorddriver_tabs' => array (
             'VuFind\RecordDriver\SolrDefault' => array (
                 'tabs' => array (
                     'Similar' => null,
+                    'CollectionList' => 'CollectionList',
                 )
             ),
             'VuFind\RecordDriver\SolrMarc' => array (
                 'tabs' => array (
                     'Similar' => null,
+                    'ArticleCL' => 'ArticleCL',
                 )
             )
         )
