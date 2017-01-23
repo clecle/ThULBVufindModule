@@ -66,7 +66,13 @@ class ArticleCollectionList extends OriginalCollectionList
         // look for children, if "Multipart resource record level" is 
         // "Part with dependent title" (assumed to be some kind of  journal)
         if ($marcLeader[18] === 'c') {
-            $result = $this->getResults();
+            // VuFind\Search\SolrCollection::initFromRecordDriver() throws an
+            // Exception, if no collection ID could be found => catch it
+            try {
+                $result = $this->getResults();
+            } catch (\Exception $e) {
+                return false;
+            }
             $visible = is_array($result->getResults()) && !empty($result->getResults());
         }
         
