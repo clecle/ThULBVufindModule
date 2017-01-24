@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category ThULB
+ * @category VuFind
  * @package  RecordTabs
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Richard Großer <richard.grosser@thulb.uni-jena.de>
@@ -27,30 +27,21 @@
  * @link     https://vufind.org/wiki/development:plugins:record_tabs Wiki
  */
 namespace ThULB\RecordTab;
-use  VuFind\RecordTab\CollectionList as OriginalCollectionList;
+use VuFind\RecordTab\CollectionList as OriginalCollectionList,
+        VuFind\Search\RecommendListener;
 
 /**
  * Collection list tab
  *
- * @category ThULB
+ * @category VuFind
  * @package  RecordTabs
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Richard Großer <richard.grosser@thulb.uni-jena.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_tabs Wiki
  */
-class ArticleCollectionList extends OriginalCollectionList
+class CollectionList extends OriginalCollectionList
 {
-
-    /**
-     * Get the on-screen description for this tab.
-     *
-     * @return string
-     */
-    public function getDescription()
-    {
-        return 'related_articles';
-    }
     
     /**
      * Is this tab initially visible?
@@ -61,27 +52,10 @@ class ArticleCollectionList extends OriginalCollectionList
     {
         $visible = false;
         
-        $marcLeader = $this->getRecordDriver()->getMarcRecord()->getLeader();
-        
-        /**
-         * @see: http://www.loc.gov/marc/bibliographic/bdleader.html
-         * 
-         * Look for children, if ...
-         * - "Multipart resource record level" is "Part with dependent title"
-         * - "Bibliographic level" is "Monograph/Item"
-         * - "Bibliographic level" is "Serial"
-         */
-        if ($marcLeader[18] === 'c'
-            || in_array($marcLeader[6], array('m', 's'))
-        ) {
-            // VuFind\Search\SolrCollection\Params::initFromRecordDriver()
-            // throws an Exception, if no collection ID could be found
-            try {
-                $result = $this->getResults();
-            } catch (\Exception $e) {
-                return false;
-            }
-            $visible = is_array($result->getResults()) && !empty($result->getResults());
+        try {
+            $visible = !empty($this->getRecordDriver()->getHierarchyTopID());
+        } catch (\Exception $ex) {
+             $visible = false;
         }
         
         return $visible;

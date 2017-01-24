@@ -45,15 +45,30 @@ use VuFind\RecordTab\Factory as OriginalFactory;
 class Factory extends OriginalFactory
 {
     /**
+     * Factory for ArticleCollectionList tab plugin.
+     *
+     * @param ServiceManager $sm Service manager.
+     *
+     * @return ArticleCollectionList
+     */
+    public static function getArticleCollectionList(ServiceManager $sm)
+    {
+        return new ArticleCollectionList(
+            $sm->getServiceLocator()->get('VuFind\SearchRunner'),
+            $sm->getServiceLocator()->get('VuFind\RecommendPluginManager')
+        );
+    }
+    
+    /**
      * Factory for CollectionList tab plugin.
      *
      * @param ServiceManager $sm Service manager.
      *
      * @return CollectionList
      */
-    public static function getArticleCollectionList(ServiceManager $sm)
+    public static function getCollectionList(ServiceManager $sm)
     {
-        return new ArticleCollectionList(
+        return new CollectionList(
             $sm->getServiceLocator()->get('VuFind\SearchRunner'),
             $sm->getServiceLocator()->get('VuFind\RecommendPluginManager')
         );
