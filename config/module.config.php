@@ -33,7 +33,6 @@ return array (
             ),
             'recordtab' => [
                 'factories' => [
-                    'articlecl' => 'ThULB\RecordTab\Factory::getArticleCollectionList',
                     'collectionlist' => 'ThULB\RecordTab\Factory::getCollectionList'
                 ]
             ]
@@ -42,14 +41,12 @@ return array (
             'VuFind\RecordDriver\SolrDefault' => array (
                 'tabs' => array (
                     'Similar' => null,
-                    'ArticleCL' => 'ArticleCL',
                     'CollectionList' => 'CollectionList',
                 )
             ),
             'VuFind\RecordDriver\SolrMarc' => array (
                 'tabs' => array (
                     'Similar' => null,
-                    'ArticleCL' => 'ArticleCL',
                     'CollectionList' => 'CollectionList'
                 )
             )

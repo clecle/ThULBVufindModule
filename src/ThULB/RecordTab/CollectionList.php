@@ -42,6 +42,7 @@ use VuFind\RecordTab\CollectionList as OriginalCollectionList,
  */
 class CollectionList extends OriginalCollectionList
 {
+    protected $isArticlesTab;
     
     /**
      * Is this tab initially visible?
@@ -53,11 +54,44 @@ class CollectionList extends OriginalCollectionList
         $visible = false;
         
         try {
-            $visible = !empty($this->getRecordDriver()->getHierarchyTopID());
+            $visible = $this->getRecordDriver()->isCollection() || $this->isArticlesTab();
         } catch (\Exception $ex) {
              $visible = false;
         }
         
         return $visible;
+    }
+    
+    protected function isArticlesTab()
+    {
+        if (is_null($this->isArticlesTab)) {
+            $this->isArticlesTab = false;
+            
+            $marcLeader = $this->getRecordDriver()->getMarcRecord()->getLeader();
+
+            /**
+             * @see: http://www.loc.gov/marc/bibliographic/bdleader.html
+             * 
+             * Look for children, if at least one of this is the case:
+             * - "Multipart resource record level" is "Part with dependent title"
+             * - "Bibliographic level" is "Monograph/Item"
+             * - "Bibliographic level" is "Serial"
+             */
+            if (in_array($marcLeader[19], array('c', ' '))
+                || in_array($marcLeader[7], array('m', 's'))
+            ) {
+                // VuFind\Search\SolrCollection\Params::initFromRecordDriver()
+                // throws an Exception, if no collection ID could be found
+                try {
+                    $result = $this->getResults();
+                } catch (\Exception $e) {
+                    return false;
+                }
+                $this->isArticlesTab = is_array($result->getResults())
+                                           && !empty($result->getResults());
+            }
+        }
+        
+        return $this->isArticlesTab;
     }
 }
