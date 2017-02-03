@@ -52,11 +52,15 @@ class PAIA extends OriginalPAIA
      *
      * @return string
      */
-    protected function getItemCallnumber($item)
+    protected function getItemCallnumber(&$item)
     {
-        return isset($item['label']) && !empty($item['label']) && strpos($item['label'], ':')
-            ? $item['label']
-            : self::DAIA_UNKNOWN_CONTENT_VALUE;
+        $callnumber = isset($item['label']) && !empty($item['label']) ? $item['label'] : self::DAIA_UNKNOWN_CONTENT_VALUE;
+        
+        if ($this->hasSignatureWithDepartmentId($item)) {
+            $callnumber = substr($callnumber, strpos($callnumber, ':') + 1);
+        }
+        
+        return $callnumber;
     }
     
     /**
@@ -152,11 +156,18 @@ class PAIA extends OriginalPAIA
         return $result;
     }
     
-    protected function getItemDepartment($item)
+    /**
+     * Returns the value of item.department.content (e.g. to be used in VuFind
+     * getStatus/getHolding array as location)
+     * 
+     * @param array $item Array with DAIA item data
+     * @return string
+     */
+    protected function getItemDepartment(&$item)
     {
         $itemDepartment = parent::getItemDepartment($item);
         
-        if (isset($item['label']) && !empty($item['label']) && strpos($item['label'], ':')) {
+        if ($this->hasSignatureWithDepartmentId($item)) {
             $depID = strstr($item['label'], ':', true);
             if (isset($this->config['DepartmentTitles'][$depID])) {
                 $itemDepartment = $this->config['DepartmentTitles'][$depID];
@@ -165,23 +176,39 @@ class PAIA extends OriginalPAIA
         
         return $itemDepartment;
     }
-    
-    protected function getItemDepartmentId($item)
+
+    /**
+     * Returns the value of item.department.id (e.g. to be used in VuFind
+     * getStatus/getHolding array as location)
+     *
+     * @param array $item Array with DAIA item data
+     *
+     * @return string
+     */
+    protected function getItemDepartmentId(&$item)
     {
         $itemDepartmentId = parent::getItemDepartmentId($item);
         
-        if (isset($item['label']) && !empty($item['label']) && strpos($item['label'], ':')) {
+        if ($this->hasSignatureWithDepartmentId($item)) {
             $itemDepartmentId = strstr($item['label'], ':', true);
         }
         
         return $itemDepartmentId;
     }
-    
-    protected function getItemDepartmentLink($item)
+
+    /**
+     * Returns the value of item.department.href (e.g. to be used in VuFind
+     * getStatus/getHolding array for linking the location)
+     *
+     * @param array $item Array with DAIA item data
+     *
+     * @return string
+     */
+    protected function getItemDepartmentLink(&$item)
     {
         $itemDepartmentLink = parent::getItemDepartmentLink($item);
         
-        if (isset($item['label']) && !empty($item['label']) && strpos($item['label'], ':')) {
+        if ($this->hasSignatureWithDepartmentId($item)) {
             $depID = strstr($item['label'], ':', true);
             if (isset($this->config['DepartmentTitles'][$depID])) {
                 $itemDepartmentLink = $this->config['DepartmentLinks'][$depID];
@@ -189,5 +216,25 @@ class PAIA extends OriginalPAIA
         }
         
         return $itemDepartmentLink;
+    }
+    
+    /**
+     * Get if the signature in the label field starts with the department id.
+     * 
+     * @param array $item Array with DAIA item data
+     * @return boolean
+     */
+    protected function hasSignatureWithDepartmentId(&$item)
+    {
+        $depPrefix = false;
+        
+        if (isset($item['label']) && !empty($item['label']) && strpos($item['label'], ':')) {
+            $depID = strstr($item['label'], ':', true);
+            if (isset($this->config['DepartmentTitles'][$depID])) {
+                $depPrefix = true;
+            }
+        }
+        
+        return $depPrefix;
     }
 }
