@@ -152,4 +152,42 @@ class PAIA extends OriginalPAIA
         return $result;
     }
     
+    protected function getItemDepartment($item)
+    {
+        $itemDepartment = parent::getItemDepartment($item);
+        
+        if (isset($item['label']) && !empty($item['label']) && strpos($item['label'], ':')) {
+            $depID = strstr($item['label'], ':', true);
+            if (isset($this->config['DepartmentTitles'][$depID])) {
+                $itemDepartment = $this->config['DepartmentTitles'][$depID];
+            }
+        }
+        
+        return $itemDepartment;
+    }
+    
+    protected function getItemDepartmentId($item)
+    {
+        $itemDepartmentId = parent::getItemDepartmentId($item);
+        
+        if (isset($item['label']) && !empty($item['label']) && strpos($item['label'], ':')) {
+            $itemDepartmentId = strstr($item['label'], ':', true);
+        }
+        
+        return $itemDepartmentId;
+    }
+    
+    protected function getItemDepartmentLink($item)
+    {
+        $itemDepartmentLink = parent::getItemDepartmentLink($item);
+        
+        if (isset($item['label']) && !empty($item['label']) && strpos($item['label'], ':')) {
+            $depID = strstr($item['label'], ':', true);
+            if (isset($this->config['DepartmentTitles'][$depID])) {
+                $itemDepartmentLink = $this->config['DepartmentLinks'][$depID];
+            }
+        }
+        
+        return $itemDepartmentLink;
+    }
 }
