@@ -244,5 +244,4 @@ class HoldingHelper extends AbstractHelper
         
         return $callnumberString;
     }
-
 }
