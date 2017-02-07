@@ -6,86 +6,86 @@ use Zend\View\Helper\AbstractHelper;
 
 class HoldingHelper extends AbstractHelper
 {
-    
-  public function getStatus(&$item)
-  {
-    $loan_availability = false;
-    $presentation_availability = false;
-    $interloan_availability = false;
-    foreach ($item[services] as $i) {
-      switch($i) {
-        case "loan":
-          $loan_availability = true;
-        case "presentation":
-          $presentation_availability = true;
-        /*case "interloan"*/
-      }
-    }
-    
-    $availabilityString = "";
-    
-    if ( isset($item['message']) ) {
-      $this->view->transEsc($item['message']);
-    } else {
-      if ( $item['availability'] ) {
-        /* Begin Available Items (Holds) */
-        $availabilityString .= '<span class="available text-success">';
-        $availabilityString .= $this->view->transEsc("Available");
-        $availabilityString .= '</span>';
-
-        /* leihbar */
-        if ( $loan_availability ) {
-          
-        }
-         /* lesesaalbenutzung */
-        elseif ( $presentation_availability ) {
-          $availabilityString .= " " . $this->view->transEsc("holding_only_presence_use");
-        }
-        /* Fernleihe */
-        elseif ( $interloan_availability ) {
-          $availabilityString .= " " . $this->view->transEsc("fernleihe");
+    public function getStatus(&$item)
+    {
+        $loan_availability = false;
+        $presentation_availability = false;
+        $interloan_availability = false;
+        foreach ($item[services] as $i) {
+            switch($i) {
+                case "loan":
+                $loan_availability = true;
+            case "presentation":
+                $presentation_availability = true;
+            /*case "interloan"*/
+            }
         }
 
-        /* bestellbar? */
-        if ( $item[order_link] != "" ) {
-          $availabilityString .= ' <a href="$holding[order_link]" target="_blank">';
-          $availabilityString .= $this->view->transEsc("holding_place");
-          $availabilityString .= '</a>';
-        }
-        /* Limitierung a la Kurzausleihe
-         * leider nicht praktikabel, da auch andere Limitierungen angezeigt werden
-         * */
-        /*if ( $item[item_notes]) {
-          $availabilityString .= " (" . $this->view->transEsc($item[item_notes]) . ")";
-        }*/
-      } elseif ( $item[availability] == 0 ) {
-        $availabilityString .= '<span class="checkedout text-danger">';
-        $availabilityString .= $this->view->transEsc("Checked Out");
-        $availabilityString .= '</span>';
-        if ( isset($item[duedate]) ) {
-          if ( $item[duedate] != '01.01.1970' ) { /* bei Vormerkung über den OPAC wird kein Datum gesetzt */
-            $availabilityString .= " " . $this->view->transEsc("Due") . " ";
-            $availabilityString .= $this->view->transEsc($item[duedate]);
-          }
-          $availabilityString .= ' <a href="$item[recall_link]" target="_blank">';
-          $availabilityString .= $this->view->transEsc("Recall This");
-          $availabilityString .= '</a>';
-          }
-          if ( $item[loan_queue] != "" ) {
-            $availabilityString .= $item[loan_queue];
-            $availabilityString .= $this->view->transEsc("holding_recalled");
-          }
+        $availabilityString = "";
+    
+        if (isset($item['message'])) {
+            $this->view->transEsc($item['message']);
         } else {
-          if ( $item[interlibraryLoan] == "1" ) {
-            $availabilityString .= '<span><a href="http://gso.gbv.de/request/FORM/LOAN?PPN=$item[id]" target="_blank">';
-            $availabilityString .= $this->view-transEsc("interlibrary loan");
-            $availabilityString .= '</a></span>';
-          } else {
-            $availabilityString .= $this->view-transEsc("holding_not_for_loan");
-          }
+            if ($item['availability']) {
+                /* Begin Available Items (Holds) */
+                $availabilityString .= '<span class="available text-success">';
+                $availabilityString .= $this->view->transEsc("Available");
+                $availabilityString .= '</span>';
+                
+                /* leihbar */
+                if ($loan_availability) {
+
+                }
+                 /* lesesaalbenutzung */
+                elseif ($presentation_availability) {
+                    $availabilityString .= " " . $this->view->transEsc("holding_only_presence_use");
+                }
+                /* Fernleihe */
+                elseif ($interloan_availability) {
+                    $availabilityString .= " " . $this->view->transEsc("fernleihe");
+                }
+
+                /* bestellbar? */
+                if ($item[order_link] != "") {
+                    $availabilityString .= ' <a href="$holding[order_link]" target="_blank">';
+                    $availabilityString .= $this->view->transEsc("holding_place");
+                    $availabilityString .= '</a>';
+                }
+                /* Limitierung a la Kurzausleihe
+                 * leider nicht praktikabel, da auch andere Limitierungen angezeigt werden
+                 * */
+                /*if ($item[item_notes]) {
+                  $availabilityString .= " (" . $this->view->transEsc($item[item_notes]) . ")";
+                }*/
+            } elseif ($item[availability] == 0) {
+                $availabilityString .= '<span class="checkedout text-danger">';
+                $availabilityString .= $this->view->transEsc("Checked Out");
+                $availabilityString .= '</span>';
+                if (isset($item[duedate])) {
+                    if ($item[duedate] != '01.01.1970') { /* bei Vormerkung über den OPAC wird kein Datum gesetzt */
+                        $availabilityString .= " " . $this->view->transEsc("Due") . " ";
+                        $availabilityString .= $this->view->transEsc($item[duedate]);
+                    }
+                    $availabilityString .= ' <a href="$item[recall_link]" target="_blank">';
+                    $availabilityString .= $this->view->transEsc("Recall This");
+                    $availabilityString .= '</a>';
+                }
+                if ($item[loan_queue] != "") {
+                    $availabilityString .= $item[loan_queue];
+                    $availabilityString .= $this->view->transEsc("holding_recalled");
+                }
+            } else {
+                if ($item[interlibraryLoan] == "1") {
+                    $availabilityString .= '<span><a href="http://gso.gbv.de/request/FORM/LOAN?PPN=$item[id]" target="_blank">';
+                    $availabilityString .= $this->view->transEsc("interlibrary loan");
+                    $availabilityString .= '</a></span>';
+                } else {
+                    $availabilityString .= $this->view->transEsc("holding_not_for_loan");
+                }
+            }
         }
-      }
-      return $availabilityString;
+        
+        return $availabilityString;
     }
   
     public function getAvailability(&$itemRow)
@@ -191,12 +191,12 @@ class HoldingHelper extends AbstractHelper
       
 
       list($txt, $epn) = explode(":", $item[item_id]);
-      $retVal = array();
+      $retVal = [];
 
       /*
        * Variante 1
        */
-      if ( is_null($record) ) {
+      if (is_null($record)) {
         $record = $this->view->driver;
        }
 
@@ -205,8 +205,8 @@ class HoldingHelper extends AbstractHelper
       $allComments = $record->getFieldArray('980', ['2', 'b', 'g', 'k', 'l'], false);
 
       foreach ($allComments as $aC) {
-        if ( $aC['2'] == $iln ) {
-          if ( $aC['b'] == $epn ) {
+        if ($aC['2'] == $iln) {
+          if ($aC['b'] == $epn) {
             $retVal[] = $aC['g'];
           }
         }

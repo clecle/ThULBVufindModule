@@ -118,7 +118,7 @@ class PAIA extends OriginalPAIA
                     = (isset($item['href']) ? $item['href'] : $doc_href);
                 // about Field
                 $result_item['about']
-                    = (isset($item['about']) ? $item['about'] : "");                
+                    = (isset($item['about']) ? $item['about'] : "");
                 // count items
                 $number++;
                 $result_item['number'] = $this->getItemNumber($item, $number);

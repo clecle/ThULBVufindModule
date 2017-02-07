@@ -1,15 +1,15 @@
 <?php
 namespace ThULB\Module\Configuration;
 
-return array (
-    'controllers' => array (
-        'invokables'    => array (
+return [
+    'controllers' => [
+        'invokables'    => [
             'summon' => 'ThULB\Controller\SummonController',
             'summonrecord' => 'ThULB\Controller\SummonrecordController'
-        )
-    ),
-    'vufind' => array (
-        'plugin_managers' => array (
+        ]
+    ],
+    'vufind' => [
+        'plugin_managers' => [
             'hierarchy_treedataformatter' => [
                 'invokables' => [
                     'json' => 'ThULB\Hierarchy\TreeDataFormatter\Json'
@@ -25,32 +25,32 @@ return array (
                     'paia' => 'ThULB\ILS\Driver\Factory::getPAIA'
                 ]
             ],
-            'recorddriver' => array (
-                'factories' => array (
+            'recorddriver' => [
+                'factories' => [
                     'solrmarc' => 'ThULB\RecordDriver\Factory::getSolrMarc',
                     'summon' => 'ThULB\RecordDriver\Factory::getSummon'
-                ),
-            )
-        ),
-        'recorddriver_tabs' => array (
-            'VuFind\RecordDriver\SolrDefault' => array (
-                'tabs' => array (
+                ],
+            ]
+        ],
+        'recorddriver_tabs' => [
+            'VuFind\RecordDriver\SolrDefault' => [
+                'tabs' => [
                     'Similar' => null,
                     'CollectionList' => 'CollectionList',
-                )
-            ),
-            'VuFind\RecordDriver\SolrMarc' => array (
-                'tabs' => array (
+                ]
+            ],
+            'VuFind\RecordDriver\SolrMarc' => [
+                'tabs' => [
                     'Similar' => null,
                     'CollectionList' => 'CollectionList'
-                )
-            )
-        )
-    ),
-  'view_helpers' => array(
-      'invokables' => array(
+                ]
+            ]
+        ]
+    ],
+  'view_helpers' => [
+      'invokables' => [
         'thulb_metadatahelper' => 'ThULB\View\Helper\Record\MetaDataHelper',
         'thulb_holdinghelper' => 'ThULB\View\Helper\Record\HoldingHelper'
-      ),
-   ),
-);
+      ],
+   ],
+];

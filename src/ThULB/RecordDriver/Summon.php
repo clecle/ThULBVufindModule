@@ -2,14 +2,14 @@
 
 namespace ThULB\RecordDriver;
 
-use \VuFind\RecordDriver\Summon as OriginalSummon;
+use VuFind\RecordDriver\Summon as OriginalSummon;
 
 /**
  * Overwrites and extends VuFinds standard Summon RecordDriver
  *
  * @author Richard Großer <richard.grosser@thulb.uni-jena.de>
  */
-class Summon extends OriginalSummon 
+class Summon extends OriginalSummon
 {
     public function getURLs()
     {

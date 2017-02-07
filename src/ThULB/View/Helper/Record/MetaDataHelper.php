@@ -14,7 +14,7 @@ class MetaDataHelper extends AbstractHelper
      * @return String
      */
     public function title($record = null)
-    {   
+    {
         if (is_null($record)) {
             $record = $this->view->driver;
         }
@@ -23,11 +23,10 @@ class MetaDataHelper extends AbstractHelper
 // @todo: add custom title logic based on the marc record
 //            /** @var File_MARC_Record $marcRecord */
 //            $marcRecord = $record->getMarcRecord();
-            
+
             return $record->getTitle();
         }
-        
+
         return $this->view->transEsc('record_title_unknown');
     }
-    
 }

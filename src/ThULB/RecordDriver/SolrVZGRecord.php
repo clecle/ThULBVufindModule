@@ -4,7 +4,6 @@ namespace ThULB\RecordDriver;
 
 class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
 {
-
     /**
      * Get the short (pre-subtitle) title of the record.
      *

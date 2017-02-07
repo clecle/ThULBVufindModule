@@ -4,7 +4,6 @@ namespace ThULB\RecordDriver;
 
 class Factory
 {
-
     /**
      * Factory for SolrMarc record driver.
      *
@@ -48,4 +47,3 @@ class Factory
         return $driver;
     }
 }
-

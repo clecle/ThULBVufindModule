@@ -8,7 +8,7 @@
 
 namespace ThULB\Hierarchy\TreeDataSource;
 
-use \VuFind\Hierarchy\TreeDataSource\Solr as OriginalSolr;
+use VuFind\Hierarchy\TreeDataSource\Solr as OriginalSolr;
 use VuFind\Hierarchy\TreeDataFormatter\PluginManager as FormatterManager;
 use VuFindSearch\Backend\Solr\Connector;
 use VuFindSearch\ParamBag;
