@@ -165,7 +165,7 @@ class PAIA extends OriginalPAIA
      */
     protected function getItemDepartment(&$item)
     {
-        $itemDepartment = parent::getItemDepartment($item);
+        $itemDepartment = isset($this->config['DepartmentTitles']['default']) ? $this->config['DepartmentTitles']['default'] : parent::getItemDepartment($item);
         
         if ($this->hasSignatureWithDepartmentId($item)) {
             $depID = strstr($item['label'], ':', true);
@@ -206,7 +206,7 @@ class PAIA extends OriginalPAIA
      */
     protected function getItemDepartmentLink(&$item)
     {
-        $itemDepartmentLink = parent::getItemDepartmentLink($item);
+        $itemDepartmentLink = isset($this->config['DepartmentLinks']['default']) ? $this->config['DepartmentLinks']['default'] : parent::getItemDepartmentLink($item);
         
         if ($this->hasSignatureWithDepartmentId($item)) {
             $depID = strstr($item['label'], ':', true);
