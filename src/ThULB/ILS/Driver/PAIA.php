@@ -145,7 +145,6 @@ class PAIA extends OriginalPAIA
                 // add result_item to the result array, if at least one relevant
                 // information is present
                 if ($result_item['callnumber'] !== self::DAIA_UNKNOWN_CONTENT_VALUE
-                    || $result_item['location'] !== self::DAIA_UNKNOWN_CONTENT_VALUE
                     || $result_item['about']
                 ) {
                     $result[] = $result_item;
