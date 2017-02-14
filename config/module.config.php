@@ -46,6 +46,12 @@ return [
                     'CollectionList' => 'CollectionList',
                     'Description'   => null
                 ]
+            ],
+            'VuFind\RecordDriver\Summon' => [
+                'tabs' => [
+                    'Description' => null
+                ],
+                'defaultTab' => null,
             ]
         ]
     ],
