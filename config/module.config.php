@@ -37,12 +37,14 @@ return [
                 'tabs' => [
                     'Similar' => null,
                     'CollectionList' => 'CollectionList',
+                    'Description'   => null
                 ]
             ],
             'VuFind\RecordDriver\SolrMarc' => [
                 'tabs' => [
                     'Similar' => null,
-                    'CollectionList' => 'CollectionList'
+                    'CollectionList' => 'CollectionList',
+                    'Description'   => null
                 ]
             ]
         ]
