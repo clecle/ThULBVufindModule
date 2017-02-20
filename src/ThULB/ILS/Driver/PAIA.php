@@ -52,7 +52,7 @@ class PAIA extends OriginalPAIA
      *
      * @return string
      */
-    protected function getItemCallnumber(&$item)
+    protected function getItemCallnumber($item)
     {
         $callnumber = isset($item['label']) && !empty($item['label']) ? $item['label'] : self::DAIA_UNKNOWN_CONTENT_VALUE;
         
@@ -162,7 +162,7 @@ class PAIA extends OriginalPAIA
      * @param array $item Array with DAIA item data
      * @return string
      */
-    protected function getItemDepartment(&$item)
+    protected function getItemDepartment($item)
     {
         $itemDepartment = isset($this->config['DepartmentTitles']['default']) ? $this->config['DepartmentTitles']['default'] : parent::getItemDepartment($item);
         
@@ -184,7 +184,7 @@ class PAIA extends OriginalPAIA
      *
      * @return string
      */
-    protected function getItemDepartmentId(&$item)
+    protected function getItemDepartmentId($item)
     {
         $itemDepartmentId = parent::getItemDepartmentId($item);
         
@@ -203,7 +203,7 @@ class PAIA extends OriginalPAIA
      *
      * @return string
      */
-    protected function getItemDepartmentLink(&$item)
+    protected function getItemDepartmentLink($item)
     {
         $itemDepartmentLink = isset($this->config['DepartmentLinks']['default']) ? $this->config['DepartmentLinks']['default'] : parent::getItemDepartmentLink($item);
         
