@@ -165,7 +165,6 @@ class GetParam implements PermissionProviderInterface,
         $queryParamString = $this->request->getQuery()->get($queryParamName);
         $queryParamString = ($queryParamString === null) ? $this->cookieManager->get($queryParamName) : $queryParamString;
         if ($queryParamString === null) {
-            $this->cookieManager->clear($queryParamName);
             // check fails if query param is missing
             return false;
         }
@@ -189,9 +188,7 @@ class GetParam implements PermissionProviderInterface,
             $result = !$result;
         }
 
-        if ($result) {
-            $this->cookieManager->set($queryParamName, $queryParamString, time() + $this->cookieLifetime);
-        }
+        $this->cookieManager->set($queryParamName, $queryParamString, time() + $this->cookieLifetime);
         
         return $result;
     }
