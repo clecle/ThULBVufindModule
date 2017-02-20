@@ -29,6 +29,6 @@ class Factory
      */
     public static function getGetParam(ServiceManager $sm)
     {
-        return new GetParam($sm->getServiceLocator()->get('Request'));
+        return new GetParam($sm->getServiceLocator()->get('Request'), $sm->getServiceLocator()->get('VuFind\CookieManager'));
     }
 }

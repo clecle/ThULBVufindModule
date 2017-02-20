@@ -30,6 +30,7 @@
  */
 namespace ThULB\Role\PermissionProvider;
 use VuFind\Role\PermissionProvider\PermissionProviderInterface;
+use Vufind\Cookie\CookieManager;
 use Zend\Http\PhpEnvironment\Request;
 
 /**
@@ -55,6 +56,20 @@ class GetParam implements PermissionProviderInterface,
      * @var Request
      */
     protected $request;
+    
+    /**
+     * The CookieManager
+     *
+     * @var CookieManager
+     */
+    protected $cookieManager;
+    
+    /**
+     * Lifetime of a cookie to keep the information about a provided query param.
+     *
+     * @var type 
+     */
+    protected $cookieLifetime = 600;
 
     /**
      * Aliases for query param names (default: none)
@@ -82,9 +97,10 @@ class GetParam implements PermissionProviderInterface,
      *
      * @param Request $request Request object
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, CookieManager $cookieManager)
     {
         $this->request = $request;
+        $this->cookieManager = $cookieManager;
     }
 
     /**
@@ -147,6 +163,7 @@ class GetParam implements PermissionProviderInterface,
 
         // query param values to check
         $queryParamString = $this->request->getQuery()->get($queryParamName);
+        $queryParamString = ($queryParamString === null) ? $this->cookieManager->get($queryParamName) : $queryParamString;
         if ($queryParamString === null) {
             // check fails if query param is missing
             return false;
@@ -171,6 +188,10 @@ class GetParam implements PermissionProviderInterface,
             $result = !$result;
         }
 
+        if ($result) {
+            $this->cookieManager->set($queryParamName, $queryParamString, time() + $this->cookieLifetime);
+        }
+        
         return $result;
     }
 
