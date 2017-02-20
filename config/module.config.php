@@ -55,10 +55,19 @@ return [
             ]
         ]
     ],
-  'view_helpers' => [
-      'invokables' => [
-        'thulb_metadatahelper' => 'ThULB\View\Helper\Record\MetaDataHelper',
-        'thulb_holdinghelper' => 'ThULB\View\Helper\Record\HoldingHelper'
-      ],
-   ],
+   'view_helpers' => [
+       'invokables' => [
+         'thulb_metadatahelper' => 'ThULB\View\Helper\Record\MetaDataHelper',
+         'thulb_holdinghelper' => 'ThULB\View\Helper\Record\HoldingHelper'
+       ],
+    ],
+    
+    // Authorization configuration:
+    'zfc_rbac' => [
+        'vufind_permission_provider_manager' => [
+            'factories' => [
+                'getParam' => 'ThULB\Role\PermissionProvider\Factory::getGetParam',
+            ]
+        ],
+    ],
 ];
