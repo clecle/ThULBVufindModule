@@ -105,7 +105,6 @@ class RecordDataFormatterFactory extends OrignalFactory
             'Related Items', 'getAllRecordLinks', 'data-allRecordLinks.phtml'
         );
         $spec->setTemplateLine('Tags', true, 'data-tags.phtml');
-        $spec->setLine('Summary', 'getSummary');
         $spec->setLine('Item Description', 'getGeneralNotes');
         $spec->setLine('Physical Description', 'getPhysicalDescriptions');
         $spec->setLine('Publication Frequency', 'getPublicationFrequency');
@@ -121,6 +120,7 @@ class RecordDataFormatterFactory extends OrignalFactory
         $spec->setLine('Finding Aid', 'getFindingAids');
         $spec->setLine('Publication_Place', 'getHierarchicalPlaceNames');
         $spec->setTemplateLine('Author Notes', true, 'data-authorNotes.phtml');
+        $spec->setTemplateLine('Basic Classification', true, 'data-basicClassification.phtml');
         return $spec->getArray();
     }
 }
