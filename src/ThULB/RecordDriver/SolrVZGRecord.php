@@ -61,7 +61,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     }
 
     /**
-     * Get credits of people involved in production of the item.
+     * Get basic classification numbers of the record.
      *
      * @return array
      */
