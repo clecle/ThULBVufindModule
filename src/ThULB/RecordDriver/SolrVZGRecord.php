@@ -71,6 +71,18 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         
         return $fields;
     }
+
+    /**
+     * Get classification numbers of the record in the "Thüringen-Bibliographie".
+     *
+     * @return array
+     */
+    public function getThuBiblioClassification()
+    {
+        $fields = $this->getConditionalFieldArray('983', ['a'], true, ' ', ['2' => '31']);
+        
+        return $fields;
+    }
     
     /**
      * Return an array of all values extracted from the specified field/subfield
