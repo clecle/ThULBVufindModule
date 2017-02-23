@@ -21,14 +21,14 @@ use Zend\ServiceManager\ServiceManager;
 class Factory
 {
     /**
-     * Factory for GetParam
+     * Factory for QueriedCookie
      *
      * @param ServiceManager $sm Service manager.
      *
      * @return GetParam
      */
-    public static function getGetParam(ServiceManager $sm)
+    public static function getQueriedCookie(ServiceManager $sm)
     {
-        return new GetParam($sm->getServiceLocator()->get('Request'), $sm->getServiceLocator()->get('VuFind\CookieManager'));
+        return new QueriedCookie($sm->getServiceLocator()->get('Request'), $sm->getServiceLocator()->get('VuFind\CookieManager'));
     }
 }

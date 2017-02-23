@@ -1,6 +1,6 @@
 <?php
 /**
- * GET parameter permission provider for VuFind (forked from Vufind\Role\ServerParam).
+ * Queried cookie permission provider for VuFind (forked from Vufind\Role\ServerParam).
  *
  * PHP version 5
  *
@@ -34,7 +34,7 @@ use Vufind\Cookie\CookieManager;
 use Zend\Http\PhpEnvironment\Request;
 
 /**
- * GET parameter permission provider for VuFind.
+ * Queried cookie permission provider for VuFind.
  *
  * @category ThULB
  * @package  Authorization
@@ -45,7 +45,7 @@ use Zend\Http\PhpEnvironment\Request;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
-class GetParam implements PermissionProviderInterface,
+class QueriedCookie implements PermissionProviderInterface,
     \Zend\Log\LoggerAwareInterface
 {
     use \VuFind\Log\LoggerAwareTrait;
@@ -69,7 +69,7 @@ class GetParam implements PermissionProviderInterface,
      *
      * @var type 
      */
-    protected $cookieLifetime = 600;
+    protected $cookieLifetime = 31536000;   // one year
 
     /**
      * Aliases for query param names (default: none)
