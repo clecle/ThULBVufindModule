@@ -21,9 +21,10 @@ class AjaxController extends OriginalAjaxController {
     {
         $index = $this->params()->fromPost('index', $this->params()->fromQuery('index'));
         $lookFor = $this->params()->fromPost('lookfor', $this->params()->fromQuery('lookfor'));
+        $type = $this->params()->fromPost('type', $this->params()->fromQuery('type'));
        
         $runner = $this->getServiceLocator()->get('VuFind\SearchRunner');
-        $result = $runner->run(['limit' => '0', 'type' => 'AllFields', 'lookfor' => $lookFor], $index);
+        $result = $runner->run(['limit' => '0', 'type' => $type, 'lookfor' => $lookFor], $index);
         
         $numberFormatter = $this->getViewRenderer()->plugin('localizedNumber');
         
