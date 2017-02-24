@@ -84,9 +84,18 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $fields;
     }
     
-    /* Anmerkungen from 546 $a */
-    public function getLanguageNotes() {
-        return $this->getFirstFieldValue('546', ['a']);
+    /* ZDB Number from 035 $a */
+    public function getZDBID() {
+        $id_nums = $this->getFieldArray('035', ['a']);
+        $zdb_nums[] = "";
+
+        foreach ($id_nums as $id_num) {
+          list($institution, $id) = explode(")", $id_num);
+          if ( $institution == "(DE-599" ) {
+            array_push($zdb_nums, $id);
+          }
+        }
+        return $zdb_nums;
     }
     
     /* Erscheinungsverlauf from 362 $a */
@@ -99,6 +108,11 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $this->getFirstFieldValue('515', ['a']);
     }
     
+    /* Anmerkungen from 546 $a */
+    public function getLanguageNotes() {
+        return $this->getFirstFieldValue('546', ['a']);
+    }
+
     
     /**
      * Return an array of all values extracted from the specified field/subfield
