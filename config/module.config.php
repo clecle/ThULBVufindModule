@@ -5,7 +5,8 @@ return [
     'controllers' => [
         'invokables'    => [
             'summon' => 'ThULB\Controller\SummonController',
-            'summonrecord' => 'ThULB\Controller\SummonrecordController'
+            'summonrecord' => 'ThULB\Controller\SummonrecordController',
+            'ajax' => 'ThULB\Controller\AjaxController',
         ]
     ],
     'vufind' => [
