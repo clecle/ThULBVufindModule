@@ -66,7 +66,7 @@ return [
     'zfc_rbac' => [
         'vufind_permission_provider_manager' => [
             'factories' => [
-                'getParam' => 'ThULB\Role\PermissionProvider\Factory::getGetParam',
+                'queriedCookie' => 'ThULB\Role\PermissionProvider\Factory::getQueriedCookie',
             ]
         ],
     ],
