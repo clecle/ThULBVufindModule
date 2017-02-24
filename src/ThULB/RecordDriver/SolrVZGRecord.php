@@ -84,31 +84,58 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $fields;
     }
     
-    /* ZDB Number from 035 $a */
+    /**
+     * extract ZDB Number from 035 $a
+     * 
+     * searches for a string like "(DE-599)ZDBNNNNNN"
+     * where DE-599 stands for ISIL - Staatsbibliothek Berlin
+     * followed by ZDB Number
+     * 
+     * @return array
+     */
     public function getZDBID() {
         $id_nums = $this->getFieldArray('035', ['a']);
         $zdb_nums[] = "";
 
         foreach ($id_nums as $id_num) {
-          list($institution, $id) = explode(")", $id_num);
-          if ( $institution == "(DE-599" ) {
+          /* @TODO performance von explode vs. regex? */
+          list($institution, $id) = explode("(DE-599)", $id_num);
+          if ( $id ) {
             array_push($zdb_nums, $id);
           }
         }
         return $zdb_nums;
     }
     
-    /* Erscheinungsverlauf from 362 $a */
+    /**
+     *  Erscheinungsverlauf from 362 $a
+     * 
+     * @TODO repeatable?
+     * 
+     * @return string
+     */
     public function getNumbering() {
         return $this->getFirstFieldValue('362', ['a']);
     }
     
-    /* Erscheinungsverlauf from 515 $a */
+    /**
+     * Erscheinungsverlauf from 515 $a
+     * 
+     * not repeatable
+     * 
+     * @return string
+     */
     public function getNumberingPeculiarities() {
         return $this->getFirstFieldValue('515', ['a']);
     }
     
-    /* Anmerkungen from 546 $a */
+    /**
+     * Anmerkungen from 546 $a
+     * 
+     * not repeatable
+     * 
+     * @return string
+     */
     public function getLanguageNotes() {
         return $this->getFirstFieldValue('546', ['a']);
     }
