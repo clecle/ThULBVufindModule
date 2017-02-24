@@ -126,11 +126,11 @@ class HoldingHelper extends AbstractHelper
                     if (isset($itemRow['duedate']) && $itemRow['duedate']) {
                         $availabilityString .= '&ndash; <span class="small">' . $this->view->transEsc("Due") . ': ' . $this->view->escapeHtml($itemRow['duedate']) . '</span>';
                     }
-                    if (isset($itemRow['requests_placed']) && $itemRow['requests_placed'] > 0) {
-                        $availabilityString .= '<span>' . $this->view->transEsc("Requests") . ': ' . $this->view->escapeHtml($itemRow['requests_placed']) . '</span>';
-                    }
                     if (isset($itemRow['link']) && $itemRow['link']) {
                         $availabilityString .= '<a class="' . ($check ? 'checkRequest' : '') . 'placehold" data-lightbox href="' . $this->view->recordLink()->getRequestUrl($itemRow['link']) . '"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;' . $this->view->transEsc($check ? "Check Recall" : "Recall This") . '</a>';
+                    }
+                    if (isset($itemRow['requests_placed']) && $itemRow['requests_placed'] > 0) {
+                        $availabilityString .= ' <span>(' . $this->view->escapeHtml($itemRow['requests_placed']) . 'x '. $this->view->transEsc("ils_hold_item_requested") . ')</span>';
                     }
                 }
             }
