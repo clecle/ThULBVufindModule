@@ -84,6 +84,22 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $fields;
     }
     
+    /* Anmerkungen from 546 $a */
+    public function getLanguageNotes() {
+        return $this->getFirstFieldValue('546', ['a']);
+    }
+    
+    /* Erscheinungsverlauf from 362 $a */
+    public function getNumbering() {
+        return $this->getFirstFieldValue('362', ['a']);
+    }
+    
+    /* Erscheinungsverlauf from 515 $a */
+    public function getNumberingPeculiarities() {
+        return $this->getFirstFieldValue('515', ['a']);
+    }
+    
+    
     /**
      * Return an array of all values extracted from the specified field/subfield
      * combination.  If multiple subfields are specified and $concat is true, they
