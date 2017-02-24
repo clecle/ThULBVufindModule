@@ -85,6 +85,7 @@ class RecordDataFormatterFactory extends OrignalFactory
             ['helperMethod' => 'getFormatList']
         );
         $spec->setTemplateLine('Languages', 'getLanguages', 'data-languages.phtml');
+        $spec->setTemplateLine('LanguageNotes', true, 'data-language_notes.phtml');
         $spec->setTemplateLine(
             'Published', 'getPublicationDetails', 'data-publicationDetails.phtml'
         );
