@@ -94,6 +94,7 @@ class RecordDataFormatterFactory extends OrignalFactory
             ['prefix' => '<span property="bookEdition">', 'suffix' => '</span>']
         );
         $spec->setTemplateLine('Series', 'getSeries', 'data-series.phtml');
+        $spec->setTemplateLine('Numbering', true, 'data-numbering.phtml');
         $spec->setTemplateLine('NumPecs', true, 'data-numbering_peculiarities.phtml');
         $spec->setTemplateLine(
             'Subjects', 'getAllSubjectHeadings', 'data-allSubjectHeadings.phtml'

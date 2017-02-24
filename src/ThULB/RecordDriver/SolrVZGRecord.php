@@ -84,11 +84,17 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $fields;
     }
     
-    /* Anmerkungen form 546 $a */
+    /* Anmerkungen from 546 $a */
     public function getLanguageNotes() {
         return $this->getFirstFieldValue('546', ['a']);
     }
-    /* Anmerkungen form 515 $a */
+    
+    /* Erscheinungsverlauf from 362 $a */
+    public function getNumbering() {
+        return $this->getFirstFieldValue('362', ['a']);
+    }
+    
+    /* Erscheinungsverlauf from 515 $a */
     public function getNumberingPeculiarities() {
         return $this->getFirstFieldValue('515', ['a']);
     }
