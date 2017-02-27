@@ -30,4 +30,31 @@ class AjaxController extends OriginalAjaxController {
         
         return $this->output(['count' => $numberFormatter($result->getResultTotal())], self::STATUS_OK);
     }
+    
+    /**
+     * Support method for getItemStatuses() -- process a single bibliographic record
+     * for location settings other than "group".
+     *
+     * @param array  $record            Information on items linked to a single bib
+     *                                  record
+     * @param array  $messages          Custom status HTML
+     *                                  (keys = available/unavailable)
+     * @param string $locationSetting   The location mode setting used for
+     *                                  pickValue()
+     * @param string $callnumberSetting The callnumber mode setting used for
+     *                                  pickValue()
+     *
+     * @return array                    Summarized availability information
+     */
+    protected function getItemStatus($record, $messages, $locationSetting,
+        $callnumberSetting
+    ) {
+        $result = parent::getItemStatus($record, $messages, $locationSetting, $callnumberSetting);
+        
+        // overwrite the detailled service information to only show basic availability
+        $availabilityMap = ['true' => 'available', 'false' => 'unavailable'];
+        $result['availability_message'] = $messages[$availabilityMap[$result['availability']]];
+        
+        return $result;
+    }
 }
