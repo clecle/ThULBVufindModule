@@ -118,6 +118,7 @@ class RecordDataFormatterFactory extends OrignalFactory
         $spec->setLine('Bibliography', 'getBibliographyNotes');
         $spec->setLine('ISBN', 'getISBNs');
         $spec->setLine('ISSN', 'getISSNs');
+        /* ZDB Id */
         $spec->setTemplateLine('ZDB', true, 'data-zdb.phtml');
         $spec->setLine('DOI', 'getCleanDOI');
         $spec->setLine('Access', 'getAccessRestrictions');

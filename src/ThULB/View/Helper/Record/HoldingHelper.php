@@ -106,19 +106,22 @@ class HoldingHelper extends AbstractHelper
                 $availabilityString .= '<span class="text-muted">' . $this->view->transEsc("status_unknown_message") . '</span>';
             } else {
                 if ($itemRow['availability']) {
-                    /* Begin Available Items (Holds) */
+                    /* Begin AVALABLE Items (Holds) */
                     $availabilityString .= '<span class="text-success">' . $this->view->transEsc("Available") . '<link property="availability" href="http://schema.org/InStock" /></span>';
                     if (isset($itemRow['link']) && $itemRow['link']) {
                         $availabilityString .= '<a class="' . ($check ? 'checkRequest ' : '') . 'placehold" data-lightbox href="' . $this->view->recordLink()->getRequestUrl($itemRow['link']) . '"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;' . $this->view->transEsc($check ? "Check Hold" : "Place a Hold") . '</a>';
                     }
                     if (isset($itemRow['storageRetrievalRequestLink']) && $itemRow['storageRetrievalRequestLink']) {
-                        $availabilityString .= '<a class="' . ($checkStorageRetrievalRequest ? 'checkStorageRetrievalRequest ' : '') . 'placeStorageRetrievalRequest" data-lightbox href="' . $this->view->recordLink()->getRequestUrl($itemRow['storageRetrievalRequestLink']) . '"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;' . $this->view->transEsc($checkStorageRetrievalRequest ? "storage_retrieval_request_check_text" : "storage_retrieval_request_place_text") . '</a>';
+                        $availabilityString .= '<a class="' . ($checkStorageRetrievalRequest ? 'checkStorageRetrievalRequest ' : '') . 'placeStorageRetrievalRequest" data-lightbox href="' . $this->view->recordLink()->getRequestUrl($itemRow['storageRetrievalRequestLink']) . '"> <i class="fa fa-flag" aria-hidden="true"></i>&nbsp;' . $this->view->transEsc($checkStorageRetrievalRequest ? "storage_retrieval_request_check_text" : "storage_retrieval_request_place_text") . '</a>';
                     }
                     if (isset($itemRow['ILLRequestLink']) && $itemRow['ILLRequestLink']) {
                         $availabilityString .= '<a class="' . ($checkILLRequest ? 'checkILLRequest ' : '') . 'placeILLRequest" data-lightbox href="' . $this->view->recordLink()->getRequestUrl($itemRow['ILLRequestLink']) . '"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;' . $this->view->transEsc($checkILLRequest ? "ill_request_check_text" : "ill_request_place_text") . '</a>';
                     }
+                    if ( !in_array("loan", $itemRow['services']) ) {
+                      $availabilityString .= " / " . $this->view->transEsc(reading_room_only);
+                    }
                 } else {
-                    /* Begin Unavailable Items (Recalls) */
+                    /* Begin UNAVAILABLE Items (Recalls) */
                     $availabilityString .= '<span class="text-danger">' . $this->view->transEsc('ils_hold_item_' . $itemRow['status']) . '<link property="availability" href="http://schema.org/OutOfStock" /></span>';
                     if (isset($itemRow['returnDate']) && $itemRow['returnDate']) {
                         $availabilityString .= '&ndash; <span class="small">' . $this->view->escapeHtml($itemRow['returnDate']) . '</span>';
