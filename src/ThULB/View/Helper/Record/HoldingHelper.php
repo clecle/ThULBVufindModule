@@ -118,7 +118,7 @@ class HoldingHelper extends AbstractHelper
                         $availabilityString .= '<a class="' . ($checkILLRequest ? 'checkILLRequest ' : '') . 'placeILLRequest" data-lightbox href="' . $this->view->recordLink()->getRequestUrl($itemRow['ILLRequestLink']) . '"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;' . $this->view->transEsc($checkILLRequest ? "ill_request_check_text" : "ill_request_place_text") . '</a>';
                     }
                     if ( !in_array("loan", $itemRow['services']) ) {
-                      $availabilityString .= " / " . $this->view->transEsc(reading_room_only);
+                      $availabilityString .= "<br>" . $this->view->transEsc(reading_room_only);
                     }
                 } else {
                     /* Begin UNAVAILABLE Items (Recalls) */
