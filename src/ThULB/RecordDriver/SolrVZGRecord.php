@@ -140,6 +140,10 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $this->getFirstFieldValue('546', ['a']);
     }
 
+    public function getFingerprint()
+    {
+        return $this->getFieldArray('026', ['e', '5'], false);
+    }
     
     /**
      * Return an array of all values extracted from the specified field/subfield
