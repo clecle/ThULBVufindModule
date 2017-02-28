@@ -152,6 +152,12 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $this->getFieldArray('026', ['e', '5'], false);
     }
     
+    // Bibliographic citation from Marc field 510
+    public function getBibliographicCitation()
+    {
+        return $this->getFirstFieldValue('510', ['a']);
+    }
+    
     /**
      * Return an array of all values extracted from the specified field/subfield
      * combination.  If multiple subfields are specified and $concat is true, they
