@@ -98,10 +98,15 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         $zdb_nums[] = "";
 
         foreach ($id_nums as $id_num) {
-          /* @TODO performance von explode vs. regex? */
+          /* @TODO performance von explode vs. regex?
+           * (DE-599)ZDB
+           */
           list($institution, $id) = explode("(DE-599)", $id_num);
           if ( $id ) {
-            array_push($zdb_nums, $id);
+            list($zdb_pretext, $id_clean) = explode("ZDB", $id);
+            if ( $id ) {
+              array_push($zdb_nums, $id_clean);
+            }
           }
         }
         return $zdb_nums;
