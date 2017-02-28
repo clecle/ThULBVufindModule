@@ -140,6 +140,13 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $this->getFirstFieldValue('546', ['a']);
     }
 
+    /**
+     * Fingerprint information from Marc Field 026
+     * 
+     * not repeatable
+     * 
+     * @return string
+     */
     public function getFingerprint()
     {
         return $this->getFieldArray('026', ['e', '5'], false);
