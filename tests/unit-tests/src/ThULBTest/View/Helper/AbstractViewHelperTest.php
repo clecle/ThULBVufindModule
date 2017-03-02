@@ -1,18 +1,12 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace ThULBTest\View\Helper;
 
 use ThULB\RecordDriver\SolrVZGRecord;
 use Zend\Http\Client;
 
 /**
- * Description of AbstractViewHelperTest
+ * General view helper test class that provides usually used operations.
  *
  * @author Richard Großer <richard.grosser@thulb.uni-jena.de>
  */
@@ -51,8 +45,10 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
         return $renderer;
     }
     
-     /**
-     * @param $ppn
+    /**
+     * Query for a record in the index.
+     * 
+     * @param string $ppn Pica production number of a record
      * @return SolrVZGRecord|null
      * @throws \HttpException
      */
@@ -70,6 +66,7 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
         $jsonString = trim($response->getBody());
         $jsonObject = json_decode($jsonString, true);
         $marcObject = new SolrVZGRecord();
+        
         if ($jsonObject['response']['numFound'] < 1) {
             $this->markTestIncomplete("No document found with ppn \"$ppn\"...");
         }
@@ -80,5 +77,27 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
             return null;
         }
         return $marcObject;
+    }
+
+    /**
+     * Get view helpers needed by test.
+     *
+     * @return array
+     */
+    protected function getViewHelpers()
+    {
+        $context = new \VuFind\View\Helper\Root\Context();
+        return [
+//            'auth' => new \VuFind\View\Helper\Root\Auth($this->getMockBuilder('VuFind\Auth\Manager')->disableOriginalConstructor()->getMock()),
+            'context' => $context,
+//            'openUrl' => new \VuFind\View\Helper\Root\OpenUrl($context, []),
+//            'proxyUrl' => new \VuFind\View\Helper\Root\ProxyUrl(),
+            'record' => new \VuFind\View\Helper\Root\Record(),
+//            'recordLink' => new \VuFind\View\Helper\Root\RecordLink($this->getMockBuilder('VuFind\Record\Router')->disableOriginalConstructor()->getMock()),
+//            'searchTabs' => $this->getMockBuilder('VuFind\View\Helper\Root\SearchTabs')->disableOriginalConstructor()->getMock(),
+//            'transEsc' => new \VuFind\View\Helper\Root\TransEsc(),
+//            'translate' => new \VuFind\View\Helper\Root\Translate(),
+//            'usertags' => new \VuFind\View\Helper\Root\UserTags(),
+        ];
     }
 }

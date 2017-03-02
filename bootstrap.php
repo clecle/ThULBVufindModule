@@ -11,7 +11,7 @@ defined('APPLICATION_PATH')
     || define(
         'APPLICATION_PATH',
         (getenv('VUFIND_APPLICATION_PATH') ? getenv('VUFIND_APPLICATION_PATH')
-            : dirname(__DIR__) . '/../..')
+            : dirname(__DIR__) . '/..')
     );
 
 // Define application environment
@@ -68,5 +68,5 @@ if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
     $loader->register();
 }
 
-define('PHPUNIT_FIXTURES_THULB', realpath(__DIR__ . '/tests/unit-tests/fixtures'));
+define('PHPUNIT_FIXTURES_THULB', realpath(__DIR__ . '/tests/fixtures'));
 define('FINDEX_TEST_HOST', 'http://findex.gbv.de');
