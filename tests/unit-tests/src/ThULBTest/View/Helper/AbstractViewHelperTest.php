@@ -3,7 +3,11 @@
 namespace ThULBTest\View\Helper;
 
 use ThULB\RecordDriver\SolrVZGRecord;
+use VuFind\I18n\Translator\Loader\ExtendedIni;
+use VuFind\Service\Factory as ServiceFactory;
 use Zend\Http\Client;
+use Zend\I18n\Translator\Translator;
+use Zend\Mvc\I18n\Translator as MvcTranslator;
 
 /**
  * General view helper test class that provides usually used operations.
@@ -14,6 +18,8 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
 {
     const FINDEX_REQUEST_PATH = '/index/31/GBV_ILN_31/select';
     const FINDEX_QUERY_STRING = '?wt=json&fq=collection_details:"GBV_ILN_31"+AND+collection_details:"GBV_GVK"&q=id:';
+    
+    protected $translationLocale = 'de';
     
     /**
      * Get a working renderer.
@@ -85,9 +91,9 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
      * @return array
      */
     protected function getViewHelpers()
-    {
+    {   
         $context = new \VuFind\View\Helper\Root\Context();
-        return [
+        $helpers = [
 //            'auth' => new \VuFind\View\Helper\Root\Auth($this->getMockBuilder('VuFind\Auth\Manager')->disableOriginalConstructor()->getMock()),
             'context' => $context,
 //            'openUrl' => new \VuFind\View\Helper\Root\OpenUrl($context, []),
@@ -95,9 +101,44 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
             'record' => new \VuFind\View\Helper\Root\Record(),
 //            'recordLink' => new \VuFind\View\Helper\Root\RecordLink($this->getMockBuilder('VuFind\Record\Router')->disableOriginalConstructor()->getMock()),
 //            'searchTabs' => $this->getMockBuilder('VuFind\View\Helper\Root\SearchTabs')->disableOriginalConstructor()->getMock(),
-//            'transEsc' => new \VuFind\View\Helper\Root\TransEsc(),
-//            'translate' => new \VuFind\View\Helper\Root\Translate(),
+            'transEsc' => new \VuFind\View\Helper\Root\TransEsc(),
+            'translate' => new \VuFind\View\Helper\Root\Translate(),
 //            'usertags' => new \VuFind\View\Helper\Root\UserTags(),
         ];
+        $helpers['translate']->setTranslator($this->getTranslator());
+        
+        return $helpers;
+    }
+    
+    /**
+     * Factory for a valid Translator
+     */
+    protected function getTranslator() {
+        $translator = new MvcTranslator(new Translator());
+        
+        $pathStack = [
+            APPLICATION_PATH . '/languages',
+            LOCAL_OVERRIDE_DIR . '/languages'
+        ];
+        $fallbackLocales = ['de', 'en'];
+        
+        $translator->getPluginManager()->setService('ExtendedIni',
+                new \VuFind\I18n\Translator\Loader\ExtendedIni(
+                    $pathStack, $fallbackLocales
+                )
+            );
+        
+        $translator->setLocale($this->translationLocale)->addTranslationFile('ExtendedIni', null, 'default', $this->translationLocale);
+        
+        return $translator;
+    }
+    
+    /**
+     * Define a locale (e.g. 'de' or 'en')
+     * 
+     * @param string $locale
+     */
+    protected function setTranslationLocale($locale) {
+        $this->translationLocale = $locale;
     }
 }
