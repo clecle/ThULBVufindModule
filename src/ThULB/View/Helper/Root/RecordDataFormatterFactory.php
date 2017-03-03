@@ -87,7 +87,7 @@ class RecordDataFormatterFactory extends OrignalFactory
         $spec->setTemplateLine('Languages', 'getLanguages', 'data-languages.phtml');
         $spec->setTemplateLine('LanguageNotes', true, 'data-language_notes.phtml');
         $spec->setTemplateLine(
-            'Published', 'getPublicationDetails', 'data-publicationDetails.phtml'
+            'Publication Metadata', 'getPublicationDetails', 'data-publicationDetails.phtml'
         );
         $spec->setLine(
             'Edition', 'getEdition', null,
