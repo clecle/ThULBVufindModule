@@ -8,7 +8,7 @@ namespace ThULBTest\View\Helper\Root;
  *
  * @author Richard Großer <richard.grosser@thulb.uni-jena.de>
  */
-class BibliographicCitationsTest extends AbstractRecordDataFormatterTest
+class BibliographicCitationsMetadataTest extends AbstractRecordDataFormatterTest
 {
     protected $sheetName = 'Bibliographische Zitate';
     protected $metadataKey = 'Bibliographic Citations';
