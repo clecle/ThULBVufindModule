@@ -17,6 +17,8 @@ use ThULBTest\View\Helper\AbstractViewHelperTest;
 abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
 {   
     const USED_FIELDS_MARKER = 'Genutzte Felder';
+    const NAME_DE_MARKER = 'Deutsche Bezeichnung in Vollanzeige';
+    const NAME_EN_MARKER = 'Englische Bezeichnung in Vollanzeige';
 
     /**
      * Provides the name of the sheet of rda.xlsx, that holds the test cases
@@ -43,14 +45,21 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
     protected $recordDriverFunction;
     
     /**
-     * Optional key for the meta data that is tested, like it is used in  the
-     * translation ini files. This might be necessary later on, if translation
-     * should be tested too.
+     * Key for the meta data that is tested, like it is used in the
+     * translation ini files.
      * 
      * @var string 
      */
     protected $metadataKey;
     
+    /**
+     * Titles for the metadata in different languages. They get extracted from
+     * the sheet.
+     *
+     * @var array
+     */
+    protected $metadataTitles = [];
+
     /**
      * Setup test case.
      *
@@ -84,7 +93,7 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
     {
         $key = is_null($this->metadataKey) ? 'test' : $this->metadataKey;
         
-        foreach ($this->getRelevantRows() as list($comment, $ppn, $longView, $shortView, $link)) {
+        foreach ($this->getRelevantData() as list($comment, $ppn, $longViewDe, $longViewEn, $shortView, $link)) {
             $record = $this->getRecordFromFindex($ppn);
             $formatter = $this->getFormatter();
 
@@ -100,11 +109,30 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
             } else {
                 $this->markTestSkipped('No information about template or record driver function provided in class  ' . get_class($this));
             }
-
+                      
+            // Test for german metadata presentation:
             $data = $formatter->getData($record, $spec->getArray());
-            $comment = '=== Sheet: ' . $this->sheetName . ', PPN: ' . $ppn . ' ===';
-                        
-            $this->assertEquals($longView, $this->convertHtmlToString($data[$key]), $comment);
+            $comment = '=== Sheet: ' . $this->sheetName . ', PPN: ' . $ppn . ', DE ===';
+            $this->assertEquals($longViewDe, $this->convertHtmlToString($data[$key]), $comment);
+            
+            // Test for english metadata presentation:
+            if ($longViewEn) {
+                $this->setTranslationLocale('en');
+                $formatter = $this->getFormatter();
+                $data = $formatter->getData($record, $spec->getArray());
+                $comment = '=== Sheet: ' . $this->sheetName . ', PPN: ' . $ppn . ', EN ===';
+                $this->assertEquals($longViewEn, $this->convertHtmlToString($data[$key]), $comment);
+            }
+            
+            // Test for metadata title in different languages:
+            if (!is_null($this->metadataKey) && !empty($this->metadataTitles)) {
+                foreach ($this->metadataTitles as $locale => $title) {
+                    $this->setTranslationLocale($locale);
+                    $viewHelpers = $this->getViewHelpers();
+                    $comment = '=== Sheet: ' . $this->sheetName . ', Titel ' . $locale . ' ===';
+                    $this->assertEquals($title, $viewHelpers['translate']($this->metadataKey), $comment);
+                }
+            }
         }
     }
     
@@ -129,11 +157,13 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
 
 
     /**
-     * Extracts the relevant rows from the test cases spreadsheet.
+     * Extracts the relevant rows from the test cases spreadsheet. Additionally
+     * it extracts eventually denfined metadata titles from the sheet and stores
+     * them in the $metadataTitles array.
      * 
      * @return array
      */
-    protected function getRelevantRows()
+    protected function getRelevantData()
     {
         $relevantRows = [];
         
@@ -143,7 +173,11 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
                 $isRelevantRow = false;
                 /** @var array $row */
                 foreach ($sheet->getRowIterator() as $row) {
-                    if (strpos($row[0], self::USED_FIELDS_MARKER) !== false) {
+                    if (strpos($row[0], self::NAME_DE_MARKER) !== false) {
+                        $this->metadataTitles['de'] = $row[1];
+                    } else if (strpos($row[0], self::NAME_EN_MARKER) !== false) {
+                        $this->metadataTitles['en'] = $row[1];
+                    } else if (strpos($row[0], self::USED_FIELDS_MARKER) !== false) {
                         $isRelevantRow = true;
                         continue;
                     }
@@ -151,7 +185,7 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
                         if (empty($row[0])) {
                             break;
                         }
-                        $relevantRows[] = array_slice($row, 0, 5);
+                        $relevantRows[] = array_slice($row, 0, 6);
                     }
                 }
                 break;
@@ -164,7 +198,7 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
         
         return $relevantRows;
     }
-    
+
     protected function getSpreadSheetReader()
     {
         $spreadsheetReader = ReaderFactory::create(Type::XLSX);
