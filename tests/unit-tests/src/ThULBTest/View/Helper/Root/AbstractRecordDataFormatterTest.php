@@ -102,11 +102,32 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
             }
 
             $data = $formatter->getData($record, $spec->getArray());
-
-            $this->assertContains($longView, $data[$key]);
+            $comment = '=== Sheet: ' . $this->sheetName . ', PPN: ' . $ppn . ' ===';
+                        
+            $this->assertEquals($longView, $this->convertHtmlToString($data[$key]), $comment);
         }
     }
     
+    /**
+     * Transforms the helpers html output to a string, that represents what is
+     * shown in the browser.
+     * 
+     * @param string $helperOutput
+     * @return string
+     */
+    protected function convertHtmlToString($helperOutput)
+    {
+        // convert html output to a normal string, keep linebreaks
+        $visibleOutput = strip_tags($helperOutput, '<br />');
+        // convert php linebreaks to formatted string ones
+        $visibleOutput = str_replace('<br />', "\n", $visibleOutput);
+        // remove whitespaces after linbreaks
+        $visibleOutput = preg_replace("/\n\s+/", "\n", $visibleOutput);
+        
+        return $visibleOutput;
+    }
+
+
     /**
      * Extracts the relevant rows from the test cases spreadsheet.
      * 
