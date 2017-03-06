@@ -5,8 +5,10 @@ namespace ThULBTest\View\Helper;
 use ThULB\RecordDriver\SolrVZGRecord;
 use VuFind\I18n\Translator\Loader\ExtendedIni;
 use VuFind\Service\Factory as ServiceFactory;
+use Zend\Config\Config;
 use Zend\Http\Client;
 use Zend\I18n\Translator\Translator;
+use Zend\Config\Reader\Ini as IniReader;
 use Zend\Mvc\I18n\Translator as MvcTranslator;
 
 /**
@@ -20,6 +22,8 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
     const FINDEX_QUERY_STRING = '?wt=json&fq=collection_details:"GBV_ILN_31"+AND+collection_details:"GBV_GVK"&q=id:';
     
     protected $translationLocale = 'de';
+    
+    protected $config;
     
     /**
      * Get a working renderer.
@@ -71,7 +75,7 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
         }
         $jsonString = trim($response->getBody());
         $jsonObject = json_decode($jsonString, true);
-        $marcObject = new SolrVZGRecord();
+        $marcObject = new SolrVZGRecord($this->getMainConfig());
         
         if ($jsonObject['response']['numFound'] < 1) {
             $this->markTestIncomplete("No document found with ppn \"$ppn\"...");
@@ -140,5 +144,15 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
      */
     protected function setTranslationLocale($locale) {
         $this->translationLocale = $locale;
+    }
+    
+    protected function getMainConfig()
+    {
+        if (is_null($this->config)) {
+            $iniReader = new IniReader();
+            $this->config = new Config($iniReader->fromFile(THULB_CONFIG_FILE), true);
+        }
+        
+        return $this->config;
     }
 }
