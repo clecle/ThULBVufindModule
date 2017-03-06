@@ -112,6 +112,7 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
                       
             // Test for german metadata presentation:
             $data = $formatter->getData($record, $spec->getArray());
+            
             $comment = '=== Sheet: ' . $this->sheetName . ', PPN: ' . $ppn . ', DE ===';
             $this->assertEquals($longViewDe, $this->convertHtmlToString($data[$key]), $comment);
             
@@ -145,14 +146,16 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
      */
     protected function convertHtmlToString($helperOutput)
     {
-        // convert html output to a normal string, keep linebreaks
-        $visibleOutput = strip_tags($helperOutput, '<br />');
-        // convert php linebreaks to formatted string ones
-        $visibleOutput = str_replace('<br />', "\n", $visibleOutput);
-        // remove whitespaces after linbreaks
-        $visibleOutput = preg_replace("/\n\s+/", "\n", $visibleOutput);
+        $htmlLines = explode('<br />', $helperOutput);
+        $stringLines = [];
         
-        return $visibleOutput;
+        foreach ($htmlLines as $singleLine) {
+            $stringLines[] = trim(strip_tags(preg_replace('/\n/', '', $singleLine)));
+        }
+        
+        $string = implode("\n", $stringLines);
+        
+        return $string;
     }
 
 
