@@ -114,7 +114,11 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
             $data = $formatter->getData($record, $spec->getArray());
             
             $comment = '=== Sheet: ' . $this->sheetName . ', PPN: ' . $ppn . ', DE ===';
-            $this->assertEquals($longViewDe, $this->convertHtmlToString($data[$key]), $comment);
+            $this->assertEquals(
+                    $this->normalizeUtf8String($longViewDe),
+                    $this->convertHtmlToString($data[$key]),
+                    $comment
+                );
             
             // Test for english metadata presentation:
             if ($longViewEn) {
@@ -122,7 +126,11 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
                 $formatter = $this->getFormatter();
                 $data = $formatter->getData($record, $spec->getArray());
                 $comment = '=== Sheet: ' . $this->sheetName . ', PPN: ' . $ppn . ', EN ===';
-                $this->assertEquals($longViewEn, $this->convertHtmlToString($data[$key]), $comment);
+                $this->assertEquals(
+                        $this->normalizeUtf8String($longViewEn),
+                        $this->convertHtmlToString($data[$key]),
+                        $comment
+                    );
             }
             
             // Test for metadata title in different languages:
@@ -131,7 +139,11 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
                     $this->setTranslationLocale($locale);
                     $viewHelpers = $this->getViewHelpers();
                     $comment = '=== Sheet: ' . $this->sheetName . ', Titel ' . $locale . ' ===';
-                    $this->assertEquals($title, $viewHelpers['translate']($this->metadataKey), $comment);
+                    $this->assertEquals(
+                            $this->normalizeUtf8String($title),
+                            $this->normalizeUtf8String($viewHelpers['translate']($this->metadataKey)),
+                            $comment
+                        );
                 }
             }
         }
@@ -155,7 +167,21 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
         
         $string = implode("\n", $stringLines);
         
-        return $string;
+        return $this->normalizeUtf8String($string);
+    }
+
+
+    /**
+     * German umlaut characters can be represented in different ways and can be seen as
+     * different, even if they are normally equal (e.g. 'ä' !== 'ä' in utf8). This function
+     * converts these characters to make them equal.
+     *
+     * @param string $utf8String
+     * @return string
+     */
+    protected function normalizeUtf8String($utf8String)
+    {
+        return iconv('UTF-8', 'ASCII//TRANSLIT', $utf8String);
     }
 
 
