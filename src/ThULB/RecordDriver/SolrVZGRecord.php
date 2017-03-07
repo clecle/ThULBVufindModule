@@ -158,6 +158,32 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     }
     
     /**
+     * Get an array of physical descriptions of the item.
+     *
+     * @return array
+     */
+    public function getPhysicalDescriptions()
+    {
+        $fields = $this->getMarcRecord()->getFields('300');
+        
+        $physicalDescriptions = [];
+        foreach ($fields as $singleField) {
+            $pdPt1 = $this->getSubfieldArray($singleField, ['a', 'b'], true, ' : ');
+            $pdPt2 = $this->getSubfieldArray($singleField, ['c', 'd', 'e'], true, ' ; ');
+            
+            if (!empty($pdPt1) && !empty($pdPt2)) {
+                $physicalDescriptions[] = $pdPt1[0] . ' ; ' . $pdPt2[0];
+            } else if (!empty($pdPt1)) {
+                $physicalDescriptions[] = $pdPt1[0];
+            } else if (!empty($pdPt2)) {
+                $physicalDescriptions[] = $pdPt2[0];
+            }
+        }
+        
+        return $physicalDescriptions;
+    }
+    
+    /**
      * Return an array of all values extracted from the specified field/subfield
      * combination.  If multiple subfields are specified and $concat is true, they
      * will be concatenated together in the order listed -- each entry in the array
