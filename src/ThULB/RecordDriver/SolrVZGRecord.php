@@ -184,6 +184,46 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     }
     
     /**
+     * Get the scale of a map.
+     * 
+     * @return string
+     */
+    public function getCartographicScale()
+    {
+        return $this->getFieldArray('255', ['a'], true, ' ; ');
+    }
+    
+    /**
+     * Get the projection of a map.
+     * 
+     * @return string
+     */
+    public function getCartographicProjection()
+    {
+        return $this->getFirstFieldValue('255', ['b']);
+    }
+    
+    /**
+     * Get the coordinates of a map.
+     * 
+     * @return string
+     */
+    public function getCartographicCoordinates()
+    {
+        return $this->getFirstFieldValue('255', ['c']);
+    }
+    
+    /**
+     * Get the equinox of a map.
+     * 
+     * @return string
+     */
+    public function getCartographicEquinox()
+    {
+        return $this->getFirstFieldValue('255', ['e']);
+    }
+    
+    /**
      * Return an array of all values extracted from the specified field/subfield
      * combination.  If multiple subfields are specified and $concat is true, they
      * will be concatenated together in the order listed -- each entry in the array

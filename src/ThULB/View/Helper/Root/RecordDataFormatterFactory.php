@@ -89,6 +89,10 @@ class RecordDataFormatterFactory extends OrignalFactory
         $spec->setTemplateLine(
             'Publication Metadata', 'getPublicationDetails', 'data-publicationDetails.phtml'
         );
+        $spec->setLine('Map Scale', 'getCartographicScale');
+        $spec->setLine('Map Projection', 'getCartographicProjection');
+        $spec->setLine('Map Coordinates', 'getCartographicCoordinates');
+        $spec->setLine('Map Equinox', 'getCartographicEquinox');
         $spec->setLine(
             'Edition', 'getEdition', null,
             ['prefix' => '<span property="bookEdition">', 'suffix' => '</span>']
