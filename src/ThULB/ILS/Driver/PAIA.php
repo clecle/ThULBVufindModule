@@ -156,29 +156,29 @@ class PAIA extends OriginalPAIA
     }
     
     /**
-     * Returns the value of item.department.content (e.g. to be used in VuFind
-     * getStatus/getHolding array as location)
+     * Returns a substitute for the value of item.department.content (e.g. to be
+     * used in VuFind getStatus/getHolding array as location)
      * 
      * @param array $item Array with DAIA item data
      * @return string
      */
     protected function getItemDepartment($item)
     {
-        $itemDepartment = isset($this->config['DepartmentTitles']['default']) ? $this->config['DepartmentTitles']['default'] : parent::getItemDepartment($item);
+        $itemDepartment = isset($this->config['DepartmentTitles']['default']) ? 
+                $this->config['DepartmentTitles']['default'] : 
+                parent::getItemDepartment($item);
         
         if ($this->hasSignatureWithDepartmentId($item)) {
             $depID = strstr($item['label'], ':', true);
-            if (isset($this->config['DepartmentTitles'][$depID])) {
-                $itemDepartment = $this->config['DepartmentTitles'][$depID];
-            }
+            $itemDepartment = $this->config['DepartmentTitles'][$depID];
         }
         
         return $itemDepartment;
     }
 
     /**
-     * Returns the value of item.department.id (e.g. to be used in VuFind
-     * getStatus/getHolding array as location)
+     * Returns a substitute for the value of item.department.id (e.g. to be used 
+     * in VuFind getStatus/getHolding array as location)
      *
      * @param array $item Array with DAIA item data
      *
@@ -196,8 +196,8 @@ class PAIA extends OriginalPAIA
     }
 
     /**
-     * Returns the value of item.department.href (e.g. to be used in VuFind
-     * getStatus/getHolding array for linking the location)
+     * Returns a substitute for the value of item.department.href (e.g. to be
+     * used in VuFind getStatus/getHolding array for linking the location)
      *
      * @param array $item Array with DAIA item data
      *
@@ -205,11 +205,13 @@ class PAIA extends OriginalPAIA
      */
     protected function getItemDepartmentLink($item)
     {
-        $itemDepartmentLink = isset($this->config['DepartmentLinks']['default']) ? $this->config['DepartmentLinks']['default'] : parent::getItemDepartmentLink($item);
+        $itemDepartmentLink = isset($this->config['DepartmentLinks']['default']) ?
+                $this->config['DepartmentLinks']['default'] :
+                parent::getItemDepartmentLink($item);
         
         if ($this->hasSignatureWithDepartmentId($item)) {
             $depID = strstr($item['label'], ':', true);
-            if (isset($this->config['DepartmentTitles'][$depID])) {
+            if (isset($this->config['DepartmentLinks'][$depID])) {
                 $itemDepartmentLink = $this->config['DepartmentLinks'][$depID];
             }
         }
@@ -225,15 +227,18 @@ class PAIA extends OriginalPAIA
      */
     protected function hasSignatureWithDepartmentId(&$item)
     {
-        $depPrefix = false;
+        $hasDepPrefix = false;
         
-        if (isset($item['label']) && !empty($item['label']) && strpos($item['label'], ':')) {
+        if (isset($item['label'])
+            && !empty($item['label'])
+            && strpos($item['label'], ':')
+        ) {
             $depID = strstr($item['label'], ':', true);
             if (isset($this->config['DepartmentTitles'][$depID])) {
-                $depPrefix = true;
+                $hasDepPrefix = true;
             }
         }
         
-        return $depPrefix;
+        return $hasDepPrefix;
     }
 }
