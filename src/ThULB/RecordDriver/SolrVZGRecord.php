@@ -4,6 +4,8 @@ namespace ThULB\RecordDriver;
 
 class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
 {
+    const LINK_ID_PREFIX = 'DE-601';
+    
     /**
      * Get the short (pre-subtitle) title of the record.
      *
@@ -221,6 +223,47 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     public function getCartographicEquinox()
     {
         return $this->getFirstFieldValue('255', ['e']);
+    }
+
+    /**
+     * Returns the array element for the 'getAllRecordLinks' method
+     *
+     * @param File_MARC_Data_Field $field Field to examine
+     *
+     * @return array|bool                 Array on success, boolean false if no
+     * valid link could be found in the data.
+     */
+    protected function getFieldData($field)
+    {
+        // Make sure that there is a t field to be displayed:
+        $title = $field->getSubfield('t');
+        if ($title) {
+            $title = $title->getData();
+        } else {
+            return false;
+        }
+        
+        // Try to determine an id link with prefix before using standard logic
+        $linkFields = $field->getSubfields('w');
+        foreach ($linkFields as $current) {
+            $bibLink = $this->getIdFromLinkingField($current, self::LINK_ID_PREFIX);
+            if ($bibLink) {
+                $link = ['type' => 'bib', 'value' => $bibLink];
+            }
+        }
+        
+        $retVal = false;
+        if ($link) {
+            $retVal = [
+                    'title' => $this->getRecordLinkNote($field),
+                    'value' => $title,
+                    'link'  => $link
+                ];
+        } else {
+            $retVal = parent::getFieldData($field);
+        }
+        
+        return $retVal;
     }
     
     /**
