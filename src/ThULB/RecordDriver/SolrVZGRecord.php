@@ -4,7 +4,9 @@ namespace ThULB\RecordDriver;
 
 class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
 {
-    const LINK_ID_PREFIX = 'DE-601';
+    const PPN_LINK_ID_PREFIX = 'DE-601';
+    const ZDB_LINK_ID_PREFIX = 'DE-600';
+    const DNB_LINK_ID_PREFIX = 'DE-101';
     
     /**
      * Get the short (pre-subtitle) title of the record.
@@ -224,7 +226,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     {
         return $this->getFirstFieldValue('255', ['e']);
     }
-
+    
     /**
      * Returns the array element for the 'getAllRecordLinks' method
      *
@@ -236,34 +238,84 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     protected function getFieldData($field)
     {
         // Make sure that there is a t field to be displayed:
-        $title = $field->getSubfield('t');
-        if ($title) {
+        if ($title = $field->getSubfield('t')) {
             $title = $title->getData();
         } else {
-            return false;
+            $title = false;
         }
-        
-        // Try to determine an id link with prefix before using standard logic
+
+        $linkTypeSetting = isset($this->mainConfig->Record->marc_links_link_types)
+            ? $this->mainConfig->Record->marc_links_link_types
+            : 'id,isbn,issn,zdb,dnb,title';
+        $linkTypes = explode(',', $linkTypeSetting);
         $linkFields = $field->getSubfields('w');
-        foreach ($linkFields as $current) {
-            $bibLink = $this->getIdFromLinkingField($current, self::LINK_ID_PREFIX);
-            if ($bibLink) {
-                $link = ['type' => 'bib', 'value' => $bibLink];
+
+        // Run through the link types specified in the config.
+        // For each type, check field for reference
+        // If reference found, exit loop and go straight to end
+        // If no reference found, check the next link type instead
+        foreach ($linkTypes as $linkType) {
+            switch (trim($linkType)){
+            case 'id':
+                foreach ($linkFields as $current) {
+                    $bibLink = $this->getIdFromLinkingField($current, self::PPN_LINK_ID_PREFIX);
+                    if ($bibLink) {
+                        $link = ['type' => 'bib', 'value' => $bibLink];
+                    }
+                }
+                break;
+            case 'isbn':
+                if ($isbn = $field->getSubfield('z')) {
+                    $link = [
+                        'type' => 'isbn', 'value' => trim($isbn->getData()),
+                        'exclude' => $this->getUniqueId()
+                    ];
+                }
+                break;
+            case 'issn':
+                if ($issn = $field->getSubfield('x')) {
+                    $link = [
+                        'type' => 'issn', 'value' => trim($issn->getData()),
+                        'exclude' => $this->getUniqueId()
+                    ];
+                }
+                break;
+            case 'zdb':
+                foreach ($linkFields as $current) {
+                    $bibLink = $this->getIdFromLinkingField($current, self::ZDB_LINK_ID_PREFIX);
+                    if ($bibLink) {
+                        $link = ['type' => 'zdb', 'value' => $bibLink];
+                    }
+                }
+                break;
+            case 'dnb':
+                foreach ($linkFields as $current) {
+                    $bibLink = $this->getIdFromLinkingField($current, self::DNB_LINK_ID_PREFIX);
+                    if ($bibLink) {
+                        $link = ['type' => 'dnb', 'value' => $bibLink];
+                    }
+                }
+                break;
+            case 'title':
+                if ($title) {
+                    $link = ['type' => 'title', 'value' => $title];
+                }
+                break;
+            }
+            // Exit loop if we have a link
+            if (isset($link)) {
+                break;
             }
         }
         
-        $retVal = false;
-        if ($link) {
-            $retVal = [
-                    'title' => $this->getRecordLinkNote($field),
-                    'value' => $title,
-                    'link'  => $link
-                ];
-        } else {
-            $retVal = parent::getFieldData($field);
-        }
-        
-        return $retVal;
+        $pages = $field->getSubfield('g');
+        // Make sure we have something to display:
+        return !isset($link) ? false : [
+            'title' => $this->getRecordLinkNote($field),
+            'value' => $title ? $title : 'Link',
+            'link'  => $link,
+            'pages' => $pages ? $pages->getData() : ''
+        ];
     }
     
     /**
