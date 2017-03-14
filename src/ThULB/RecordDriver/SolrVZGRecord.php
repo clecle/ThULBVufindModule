@@ -237,9 +237,14 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     protected function getFieldData($field)
     {
+        $leader = $this->getMarcRecord()->getLeader();
         // Make sure that there is a t field to be displayed:
         if ($title = $field->getSubfield('t')) {
             $title = $title->getData();
+        } else if (strtolower($leader[7]) === 'm'
+            && strtolower($leader[19]) === 'c'
+        ) {
+            $title = $this->getFirstFieldValue('245', ['a']);
         } else {
             $title = false;
         }
