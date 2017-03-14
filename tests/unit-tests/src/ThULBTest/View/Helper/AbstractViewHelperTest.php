@@ -132,7 +132,9 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
                 )
             );
         
-        $translator->setLocale($this->translationLocale)->addTranslationFile('ExtendedIni', null, 'default', $this->translationLocale);
+        $translator->setLocale($this->translationLocale)
+                ->addTranslationFile('ExtendedIni', null, 'default', $this->translationLocale)
+                ->addTranslationFile('ExtendedIni', 'Languages', 'Languages', $this->translationLocale);
         
         return $translator;
     }
