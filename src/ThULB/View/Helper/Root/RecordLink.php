@@ -31,18 +31,18 @@ class RecordLink extends OriginalRecordLink
         case 'isbn':
             $url = $urlHelper('search-results')
                 . '?lookfor=' . urlencode($link['value'])
-                . '&type=isbn&jumpto=1';
+                . '&type=isbn';
             break;
         case 'issn':
             $url = $urlHelper('search-results')
                 . '?lookfor=' . urlencode($link['value'])
-                . '&type=issn&jumpto=1';
+                . '&type=issn';
             break;
         case 'zdb':
         case 'dnb':
             $url = $urlHelper('search-results')
                 . '?lookfor=' . urlencode($link['value'])
-                . '&type=ctrlnum&jumpto=1';
+                . '&type=ctrlnum';
             break;
         case 'title':
             $url = $urlHelper('search-results')

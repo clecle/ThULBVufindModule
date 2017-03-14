@@ -317,6 +317,38 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             'pages' => $pages ? $pages->getData() : ''
         ];
     }
+
+    /**
+     * Get an array of all series names containing the record.  Array entries may
+     * be either the name string, or an associative array with 'name' and 'number'
+     * keys.
+     *
+     * @return array
+     */
+    public function getSeries()
+    {
+        $matches = [];
+
+        // First check the 440, 800 and 830 fields for series information:
+        $primaryFields = [
+            '440' => ['a', 'p'],
+            '800' => ['a', 'b', 'c', 'd', 'f', 'p', 'q', 't'],
+            '830' => ['a', 'p']];
+        $matches = $this->getSeriesFromMARC($primaryFields);
+        if (!empty($matches)) {
+            return $matches;
+        }
+
+        // Now check 490 and display it only if 440/800/830 were empty:
+        $secondaryFields = ['490' => ['a']];
+        $matches = $this->getSeriesFromMARC($secondaryFields);
+        if (!empty($matches)) {
+            return $matches;
+        }
+
+        // Still no results found?  Resort to the Solr-based method just in case!
+        return parent::getSeries();
+    }
     
     /**
      * Return an array of all values extracted from the specified field/subfield
