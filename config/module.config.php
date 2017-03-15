@@ -31,20 +31,28 @@ return [
                     'solrmarc' => 'ThULB\RecordDriver\Factory::getSolrMarc',
                     'summon' => 'ThULB\RecordDriver\Factory::getSummon'
                 ],
+            ],
+            'recordtab' => [
+                'factories' => [
+                    'articlecl' => 'ThULB\RecordTab\Factory::getArticleCollectionList',
+                    'nonarticlecl' => 'ThULB\RecordTab\Factory::getNonArticleCollectionList'
+                ]
             ]
         ],
         'recorddriver_tabs' => [
             'VuFind\RecordDriver\SolrDefault' => [
                 'tabs' => [
                     'Similar' => null,
-                    'CollectionList' => 'CollectionList',
+                    'ArticleCollectionList' => 'articlecl',
+                    'NonArticleCollectionList' => 'nonarticlecl',
                     'Description'   => null
                 ]
             ],
             'VuFind\RecordDriver\SolrMarc' => [
                 'tabs' => [
                     'Similar' => null,
-                    'CollectionList' => 'CollectionList',
+                    'ArticleCollectionList' => 'articlecl',
+                    'NonArticleCollectionList' => 'nonarticlecl',
                     'Description'   => null
                 ]
             ],
