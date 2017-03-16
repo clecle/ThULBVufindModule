@@ -45,7 +45,9 @@ return [
                     'Similar' => null,
                     'ArticleCollectionList' => 'articlecl',
                     'NonArticleCollectionList' => 'nonarticlecl',
-                    'Description'   => null
+                    'Description'   => null,
+                    'Reviews' => null,
+                    'Excerpt' => null
                 ]
             ],
             'VuFind\RecordDriver\SolrMarc' => [
@@ -53,12 +55,16 @@ return [
                     'Similar' => null,
                     'ArticleCollectionList' => 'articlecl',
                     'NonArticleCollectionList' => 'nonarticlecl',
-                    'Description'   => null
+                    'Description'   => null,
+                    'Reviews' => null,
+                    'Excerpt' => null
                 ]
             ],
             'VuFind\RecordDriver\Summon' => [
                 'tabs' => [
-                    'Description' => null
+                    'Description' => null,
+                    'Reviews' => null,
+                    'Excerpt' => null
                 ],
                 'defaultTab' => null,
             ]
