@@ -27,8 +27,7 @@
  * @link     https://vufind.org/wiki/development:plugins:record_tabs Wiki
  */
 namespace ThULB\RecordTab;
-use VuFind\RecordTab\CollectionList as OriginalCollectionList,
-        VuFind\Search\RecommendListener;
+use VuFind\Search\RecommendListener;
 
 /**
  * Article Collection list tab
@@ -40,7 +39,7 @@ use VuFind\RecordTab\CollectionList as OriginalCollectionList,
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_tabs Wiki
  */
-class ArticleCollectionList extends OriginalCollectionList
+class ArticleCollectionList extends CollectionList
 {
     /**
      * Get the on-screen description for this tab.

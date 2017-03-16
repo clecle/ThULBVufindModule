@@ -3,6 +3,9 @@ namespace ThULB\Module\Configuration;
 
 return [
     'controllers' => [
+        'factories' => [
+            'record' => 'ThULB\Controller\Factory::getRecordController',
+        ],
         'invokables'    => [
             'summon' => 'ThULB\Controller\SummonController',
             'summonrecord' => 'ThULB\Controller\SummonrecordController',
@@ -48,7 +51,8 @@ return [
                     'Description'   => null,
                     'Reviews' => null,
                     'Excerpt' => null
-                ]
+                ],
+                'backgroundLoadedTabs' => ['ArticleCollectionList', 'NonArticleCollectionList']
             ],
             'VuFind\RecordDriver\SolrMarc' => [
                 'tabs' => [
@@ -58,7 +62,8 @@ return [
                     'Description'   => null,
                     'Reviews' => null,
                     'Excerpt' => null
-                ]
+                ],
+                'backgroundLoadedTabs' => ['ArticleCollectionList', 'NonArticleCollectionList']
             ],
             'VuFind\RecordDriver\Summon' => [
                 'tabs' => [
@@ -66,7 +71,7 @@ return [
                     'Reviews' => null,
                     'Excerpt' => null
                 ],
-                'defaultTab' => null,
+                'defaultTab' => null
             ]
         ]
     ],
