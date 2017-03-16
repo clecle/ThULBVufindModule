@@ -3,9 +3,6 @@ namespace ThULB\Module\Configuration;
 
 return [
     'controllers' => [
-        'factories' => [
-            'record' => 'ThULB\Controller\Factory::getRecordController',
-        ],
         'invokables'    => [
             'summon' => 'ThULB\Controller\SummonController',
             'summonrecord' => 'ThULB\Controller\SummonrecordController',
