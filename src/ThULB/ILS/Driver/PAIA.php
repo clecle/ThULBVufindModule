@@ -13,6 +13,27 @@ class PAIA extends OriginalPAIA
     const DAIA_DOCUMENT_ID_PREFIX = 'http://uri.gbv.de/document/opac-de-27:ppn:';
     
     const DAIA_UNKNOWN_CONTENT_VALUE = 'Unknown';
+
+    /**
+     * Get Patron Holds
+     *
+     * This is responsible for retrieving all holds by a specific patron.
+     *
+     * @param array $patron The patron array from patronLogin
+     *
+     * @return mixed Array of the patron's holds on success.
+     */
+    public function getMyHolds($patron)
+    {
+        // filters for getMyHolds are:
+        // status = 1 - reserved (the document is not accessible for the patron yet,
+        //              but it will be)
+        $filter = ['status' => [1]];
+        // get items-docs for given filters
+        $items = $this->paiaGetItems($patron, $filter);
+
+        return $this->mapPaiaItems($items, 'myHoldsMapping');
+    }
     
     /**
      * Get Patron Loans

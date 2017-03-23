@@ -12,7 +12,29 @@ use VuFind\Controller\MyResearchController as OriginalController;
 class MyResearchController extends OriginalController
 {
     const ID_URI_PREFIX = 'http://uri.gbv.de/document/opac-de-27:ppn:';
-    
+   
+
+    /**
+     * We don't use this action anymore; it is replaced by the loans action, that
+     * combines all items held by the patron and all provided items
+     *
+     * @return mixed
+     */
+    public function checkedoutAction()
+    {
+        return $this->redirect()->toRoute('default', ['controller' => 'myresearch', 'action' => 'loans']);
+    }
+
+    /**
+     * We don't use this action anymore; it is replaced by the loans action, that
+     * combines all items held by the patron and all provided items
+     *
+     * @return mixed
+     */
+    public function storageRetrievalRequestsAction()
+    {
+        return $this->redirect()->toRoute('default', ['controller' => 'myresearch', 'action' => 'loans']);
+    }
 
     /**
      * Send list of checked out books to view
