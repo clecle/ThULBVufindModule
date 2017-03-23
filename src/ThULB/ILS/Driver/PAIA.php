@@ -10,9 +10,142 @@ use VuFind\ILS\Driver\PAIA as OriginalPAIA;
  */
 class PAIA extends OriginalPAIA
 {
-    const DAIA_DOCUMENT_ID_PREFIX = 'http://uri.gbv.de/document/opac-de-27:';
+    const DAIA_DOCUMENT_ID_PREFIX = 'http://uri.gbv.de/document/opac-de-27:ppn:';
     
     const DAIA_UNKNOWN_CONTENT_VALUE = 'Unknown';
+    
+    /**
+     * Get Patron Loans
+     *
+     * This is responsible for retrieving all loans (i.e. all checked out items,
+     * all storage retrieval requests and all holds with status "provided") by a
+     * specific patron.
+     *
+     * @param array $patron The patron array from patronLogin
+     *
+     * @return array Array of the patron's transactions on success,
+     */
+    public function getMyLoans($patron)
+    {
+        /* 
+         * filters for getMyTransactions are:
+         * status = 2 - ordered (the document is ordered by the patron)
+         *          3 - held (the document is on loan by the patron)
+         *          4 - provided (the document is ready to be used by the patron)
+         */
+        $filter = ['status' => [2, 3, 4]];
+        // get items-docs for given filters
+        $items = $this->paiaGetItems($patron, $filter);
+
+        return $this->mapPaiaItems($items, 'myLoansMapping');
+    }
+    
+    protected function myLoansMapping($items)
+    {
+        $results = [];
+
+        foreach ($items as $doc) {
+            $result = [];
+            // canrenew (0..1) whether a document can be renewed (bool)
+            $result['renewable'] = (isset($doc['canrenew']))
+                ? $doc['canrenew'] : false;
+
+            // item (0..1) URI of a particular copy
+            $result['item_id'] = (isset($doc['item']) ? $doc['item'] : '');
+
+            $result['renew_details']
+                = ($result['renewable']) ? $result['item_id'] : '';
+
+            // edition (0..1)  URI of a the document (no particular copy)
+            // hook for retrieving alternative ItemId in case PAIA does not
+            // the needed id
+            $result['id'] = (isset($doc['edition'])
+                ? $this->getAlternativeItemId($doc['edition']) : '');
+
+            // requested (0..1) URI that was originally requested
+
+            // about (0..1) textual description of the document
+            $result['title'] = (isset($doc['about']) ? $doc['about'] : null);
+
+            // queue (0..1) number of waiting requests for the document or item
+            $result['request'] = (isset($doc['queue']) ? $doc['queue'] : null);
+
+            // renewals (0..1) number of times the document has been renewed
+            $result['renew'] = (isset($doc['renewals']) ? $doc['renewals'] : null);
+
+            // reminder (0..1) number of times the patron has been reminded
+            $result['reminder'] = (
+                isset($doc['reminder']) ? $doc['reminder'] : null
+            );
+
+            // custom PAIA field
+            // starttime (0..1) date and time when the status began
+            $result['startTime'] = (isset($doc['starttime'])
+                ? $this->convertDatetime($doc['starttime']) : '');
+
+            // endtime (0..1) date and time when the status will expire
+            $result['dueTime'] = (isset($doc['endtime'])
+                ? $this->convertDatetime($doc['endtime']) : '');
+
+            if ($doc['status'] == '4') {
+                $result['expire'] = (isset($doc['endtime'])
+                    ? $this->convertDatetime($doc['endtime']) : '');
+            } elseif ($doc['status'] == '3') {
+                // duedate (0..1) date when the current status will expire (deprecated)
+                $result['duedate'] = (isset($doc['duedate'])
+                    ? $this->convertDate($doc['duedate']) : '');
+            }
+            
+            // storage (0..1) textual description of location of the document
+            $result['location'] = (isset($doc['storage']) && $doc['status'] != 3) ? $doc['storage'] : null;
+
+            // cancancel (0..1) whether an ordered or provided document can be
+            // canceled
+
+            // error (0..1) error message, for instance if a request was rejected
+            $result['message'] = (isset($doc['error']) ? $doc['error'] : '');
+
+            // storageid (0..1) location URI
+
+            // PAIA custom field
+            // label (0..1) call number, shelf mark or similar item label
+            $result['callnumber'] = $this->getCallNumber($doc);
+            
+            // status: provided (the document is ready to be used by the patron)
+            $result['available'] = $doc['status'] == 4 ? true : false;
+
+            // Optional VuFind fields
+            /*
+            $result['barcode'] = null;
+            $result['dueStatus'] = null;
+            $result['renewLimit'] = "1";
+            $result['volume'] = null;
+            $result['publication_year'] = null;
+            $result['isbn'] = null;
+            $result['issn'] = null;
+            $result['oclc'] = null;
+            $result['upc'] = null;
+            $result['institution_name'] = null;
+            */
+
+            $results[] = $result;
+        }
+
+        return $results;
+    }
+
+    /**
+     * PAIA support method to retrieve needed ItemId in case PAIA-response does not
+     * contain it
+     *
+     * @param string $id itemId
+     *
+     * @return string $id
+     */
+    protected function getAlternativeItemId($id)
+    {
+        return str_replace(self::DAIA_DOCUMENT_ID_PREFIX, '', $id);
+    }
     
     protected function getStatusString($item)
     {
@@ -24,25 +157,6 @@ class PAIA extends OriginalPAIA
         }
         
         return $status;
-    }
-    
-    /**
-     * Overrides the function in the DAIA driver class, to execute additional
-     * steps.
-     * 
-     * @param string $id           Record Id of the DAIA document in question.
-     * @param string $daiaResponse Raw response from DAIA request.
-     *
-     * @return Array|DOMNode|null   The DAIA document identified by id and
-     *                                  type depending on daiaResponseFormat.
-     * @throws ILSException
-     */
-    protected function extractDaiaDoc($id, $daiaResponse)
-    {
-        return parent::extractDaiaDoc(
-                    $id,
-                    $this->sanitizeDaiaDocumentIds($daiaResponse)
-                );
     }
 
     /**
@@ -64,22 +178,6 @@ class PAIA extends OriginalPAIA
     }
     
     /**
-     * This function ensures, that the condition "DAIA documents should use URIs
-     * as value for id" (see DAIA Driver class comment) is fulfilled even for a
-     * GBV response.
-     * 
-     * @see \VuFind\ILS\Driver\DAIA::extractDaiaDoc() for the failing condition
-     * @todo relax the condition in vufinds core DAIA driver, because it
-     *      contradicts the documentation of DAIA (http://gbv.github.io/daia/daia.html#documents
-     *      talks about a "globally unique identifier of the document" and not
-     *      about the request identifier in the id field)
-     */
-    private function sanitizeDaiaDocumentIds($daiaResponse)
-    {
-        return str_replace(self::DAIA_DOCUMENT_ID_PREFIX, '', $daiaResponse);
-    }
-    
-        /**
      * Parse an array with DAIA status information.
      *
      * @param string $id        Record id for the DAIA array.
