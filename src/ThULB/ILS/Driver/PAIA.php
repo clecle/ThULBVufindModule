@@ -60,6 +60,34 @@ class PAIA extends OriginalPAIA
 
         return $this->mapPaiaItems($items, 'myLoansMapping');
     }
+
+    /**
+     * Get Patron Profile
+     *
+     * This is responsible for retrieving the profile for a specific patron.
+     *
+     * @param array $patron The patron array
+     *
+     * @return array Array of the patron's profile data on success,
+     */
+    public function getMyProfile($patron)
+    {
+        $profile = parent::getMyProfile($patron);
+        
+        if (isset($profile['firstname']) && isset($profile['lastname'])) {
+            $profile['name'] = $profile['firstname'] . ' ' . $profile['lastname'];
+        }
+        
+        if (isset($patron['email'])) {
+            $profile['email'] = $patron['email'];
+        }
+        
+        if (isset($patron['address'])) {
+            $profile['address1'] = $patron['address'];
+        }
+        
+        return $profile;
+    }
     
     protected function myLoansMapping($items)
     {
