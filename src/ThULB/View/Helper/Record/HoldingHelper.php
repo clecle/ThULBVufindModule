@@ -168,10 +168,10 @@ class HoldingHelper extends AbstractHelper
     
     public function getCallNumber(&$item)
     {
-        return $item['callnumber'];
+      return $item['callnumber'];
     }
     
-    public function getHoldingComments($record = null, &$item)
+    public function getHoldingComments(&$item)
     {
       /*
        * Exemplarbezogene Daten auslesen
@@ -196,26 +196,7 @@ class HoldingHelper extends AbstractHelper
       list($txt, $epn) = explode(":", $item['item_id']);
       $retVal = [];
 
-      /*
-       * Variante 1
-       */
-      if (is_null($record)) {
-        $record = $this->view->driver;
-       }
-
-      //$marcRecord = $record->getMarcRecord();    
-/*
-      $allComments = $record->getFieldArray('980', ['2', 'b', 'g', 'k', 'l'], false);
-
-      foreach ($allComments as $aC) {
-        if ($aC['2'] == $iln) {
-          if ($aC['b'] == $epn) {
-            $retVal[] = $aC['g'];
-          }
-        }
-      }
-
-      /*
+       /*
        * Variante 2
        * leider wird item > about nicht ausgeliefert > implementiert in ILS/Drive/PAIA.php
        */
