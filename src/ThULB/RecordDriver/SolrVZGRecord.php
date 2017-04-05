@@ -431,11 +431,13 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return true;
       }
       $val = $this->getMarcRecord()->getFields('007');
-      $val2 = $val[0]->getData();
-      
-      if ( strtoupper(substr($val2, 0, 2)) == "CR" ) {
-        return true;
+      if ( !empty($val) ) {
+        $val2 = $val[0]->getData();
+        if ( strtoupper(substr($val2, 0, 2)) == "CR" ) {
+          return true;
+        }
       }
+
       return false;
     }
 
