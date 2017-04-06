@@ -86,6 +86,18 @@ class PAIA extends OriginalPAIA
             $profile['address1'] = $patron['address'];
         }
         
+        if (isset($patron['type'])
+            && is_array($patron['type'])
+            && !empty($patron['type'])
+            && preg_match('/de-27:user-type:\d{1}/', $patron['type'][0])
+        ) {
+            $profile['groupcode'] = preg_replace('/de-27:user-type:(\d{1})/', '$1', $patron['type'][0]);
+        }
+        
+        if (isset($patron['status']) && is_numeric($patron['status'])) {
+            $profile['statuscode'] = $patron['status'];
+        }
+        
         return $profile;
     }
     
