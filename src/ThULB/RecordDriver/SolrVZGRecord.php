@@ -459,20 +459,36 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
       $retVal = [];
         
       $links = $this->getConditionalFieldArray('981', ['y', 'r', '1'], true, '|', ['2' => '31']);
-      
+      $more = "";
+
       if ( !empty($links) ){
         foreach ( $links as $link ) {
           list($id, $txt, $url) = explode("|", $link);
-          $details = $this->getConditionalFieldArray('980', ['g'], true, '|', ['2' => '31', '1' => $id]);
-          if ( !empty($details) ) {
-             $retVal[] = $txt . "|" . $url . "|" . $details[0];
-          } else {
-             $retVal[] = $txt . "|" . $url . "|";
+          if ( empty($txt) ) {
+            $txt = $url;
           }
+          if ( empty($url) ) {
+            $url = $txt;
+          }
+          $details = $this->getConditionalFieldArray('980', ['g', 'k'], true, '|', ['2' => '31', '1' => $id]);
+          $corporates = $this->getConditionalFieldArray('982', ['a'], true, '|', ['2' => '31', '1' => $id]);
+          
+          if ( !empty($details) ) {
+            foreach ($details as $detail) {
+               $more .= $detail."<br>";
+            }
+          }
+          if ( !empty($corporates) ) {
+            foreach ($corporates as $corporate) {
+              $more .= $corporate."<br>";
+            }
+          }
+          $retVal[] = $txt . "|" . $url . "|" . $more;
         }
       } else {
         $retVal = $links;
       }
+      
 
       return $retVal;
     }
