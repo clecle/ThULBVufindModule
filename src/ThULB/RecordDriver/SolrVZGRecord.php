@@ -441,52 +441,6 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
       return false;
     }
 
-    /**
-     * Is record Serial?
-     *
-     * @return boolean
-     */
-    public function isSerial()
-    {
-        $leader = $this->getMarcRecord()->getLeader();
-        if ( strtoupper($leader[7] ) == "S" ) {
-          return true;
-        } else {
-          return false;
-        }
-    }
-    
-    /**
-     * Is record a Multipart Set?
-     *
-     * @return boolean
-     */
-    public function isMultiPart_HoldingsTab()
-    {
-        $leader = $this->getMarcRecord()->getLeader();
-        if ( strtoupper($leader[19]) == "A" ) {
-          return true;
-        } else {
-          return false;
-        }
-    }
-
-    /**
-     * Is Record E-Resource or accessible via Remote?
-     *
-     * @return boolean
-     */
-    public function isEResource_HoldingsTab()
-    {
-      $field = $this->getMarcRecord()->getFirstFieldValue('007');
-      if (strtoupper(substr($field, 0, 2)) == "CR") {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-
      /**
      * Return an array of associative URL arrays with one or more of the following
      * keys:
@@ -502,34 +456,40 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     public function getOnlineHoldings()
     {
-        $bibdetails = [];
-        $links = [];
-        $link = [];
-        $retVal = [];
+      $retVal = [];
+        
+      $links = $this->getConditionalFieldArray('981', ['y', 'r', '1'], true, '|', ['2' => '31']);
+      $more = "";
 
-              //$marcRecord = $record->getMarcRecord();    
-/*
-      $allComments = $record->getFieldArray('980', ['2', 'b', 'g', 'k', 'l'], false);
-
-      foreach ($allComments as $aC) {
-        if ($aC['2'] == $iln) {
-          if ($aC['b'] == $epn) {
-            $retVal[] = $aC['g'];
+      if ( !empty($links) ){
+        foreach ( $links as $link ) {
+          list($id, $txt, $url) = explode("|", $link);
+          if ( empty($txt) ) {
+            $txt = $url;
           }
+          if ( empty($url) ) {
+            $url = $txt;
+          }
+          $details = $this->getConditionalFieldArray('980', ['g', 'k'], true, '|', ['2' => '31', '1' => $id]);
+          $corporates = $this->getConditionalFieldArray('982', ['a'], true, '|', ['2' => '31', '1' => $id]);
+          
+          if ( !empty($details) ) {
+            foreach ($details as $detail) {
+               $more .= $detail."<br>";
+            }
+          }
+          if ( !empty($corporates) ) {
+            foreach ($corporates as $corporate) {
+              $more .= $corporate."<br>";
+            }
+          }
+          $retVal[] = $txt . "|" . $url . "|" . $more;
         }
+      } else {
+        $retVal = $links;
       }
-*/
-        
-        $links = $this->getConditionalFieldArray('981', ['y', 'r'], true, '|', ['2' => '31']);
-        $bibdetails = $this->getConditionalFieldArray('980', ['g'], true, '|', ['2' => '31']);
-        
-        if (count($links) > 1) {
-          list($txt, $url) = explode("|", $links[0]);
-          $link = array($txt => $url); 
-        }
-        
-        $retVal = array_merge($link, $bibdetails);
-        
-        return $retVal;
+      
+
+      return $retVal;
     }
 }
