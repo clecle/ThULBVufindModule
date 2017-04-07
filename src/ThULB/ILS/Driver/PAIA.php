@@ -313,31 +313,27 @@ class PAIA extends OriginalPAIA
 
         return $result;
     }
-    
+
     /**
-     * Returns a substitute for the value of item.department.content (e.g. to be
-     * used in VuFind getStatus/getHolding array as location)
-     * 
+     * Returns the value of item.storage.content instead of 
+     * item.department.content (e.g. to be used in VuFind getStatus/getHolding
+     * array as location)
+     *
      * @param array $item Array with DAIA item data
+     *
      * @return string
      */
     protected function getItemDepartment($item)
     {
-        $itemDepartment = isset($this->config['DepartmentTitles']['default']) ? 
-                $this->config['DepartmentTitles']['default'] : 
-                parent::getItemDepartment($item);
-        
-        if ($this->hasSignatureWithDepartmentId($item)) {
-            $depID = strstr($item['label'], ':', true);
-            $itemDepartment = $this->config['DepartmentTitles'][$depID];
-        }
-        
-        return $itemDepartment;
+        return isset($item['storage']) && isset($item['storage']['content'])
+        && !empty($item['storage']['content'])
+            ? $item['storage']['content']
+            : parent::getItemDepartment($item);
     }
 
     /**
-     * Returns a substitute for the value of item.department.id (e.g. to be used 
-     * in VuFind getStatus/getHolding array as location)
+     * Returns the value of item.storage.id instead of item.department.id (e.g.
+     * to be used in VuFind getStatus/getHolding array as location)
      *
      * @param array $item Array with DAIA item data
      *
@@ -345,18 +341,14 @@ class PAIA extends OriginalPAIA
      */
     protected function getItemDepartmentId($item)
     {
-        $itemDepartmentId = parent::getItemDepartmentId($item);
-        
-        if ($this->hasSignatureWithDepartmentId($item)) {
-            $itemDepartmentId = strstr($item['label'], ':', true);
-        }
-        
-        return $itemDepartmentId;
+        return isset($item['storage']) && isset($item['storage']['id'])
+            ? $item['storage']['id'] : parent::getItemDepartmentId($item);
     }
 
     /**
-     * Returns a substitute for the value of item.department.href (e.g. to be
-     * used in VuFind getStatus/getHolding array for linking the location)
+     * Returns the value of item.storage.href instead of item.department.href
+     * (e.g. to be used in VuFind getStatus/getHolding array for linking the
+     * location)
      *
      * @param array $item Array with DAIA item data
      *
@@ -364,18 +356,8 @@ class PAIA extends OriginalPAIA
      */
     protected function getItemDepartmentLink($item)
     {
-        $itemDepartmentLink = isset($this->config['DepartmentLinks']['default']) ?
-                $this->config['DepartmentLinks']['default'] :
-                parent::getItemDepartmentLink($item);
-        
-        if ($this->hasSignatureWithDepartmentId($item)) {
-            $depID = strstr($item['label'], ':', true);
-            if (isset($this->config['DepartmentLinks'][$depID])) {
-                $itemDepartmentLink = $this->config['DepartmentLinks'][$depID];
-            }
-        }
-        
-        return $itemDepartmentLink;
+        return isset($item['storage']['href'])
+            ? $item['storage']['href'] : parent::getItemDepartmentLink($item);
     }
     
     /**
