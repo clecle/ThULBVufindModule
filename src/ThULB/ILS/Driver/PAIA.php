@@ -174,6 +174,8 @@ class PAIA extends OriginalPAIA
             
             // status: provided (the document is ready to be used by the patron)
             $result['available'] = $doc['status'] == 4 ? true : false;
+            
+            $result['queue'] = isset($doc['queue']) ? $doc['queue'] : 0;
 
             // Optional VuFind fields
             /*
