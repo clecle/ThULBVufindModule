@@ -442,34 +442,50 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     }
 
      /**
-     * Return an array of associative URL arrays with one or more of the following
-     * keys:
-     *
-     *   <ul>desc: URL description text to display (optional)</ul>
-     *   <ul>url: fully-formed URL (required if 'route' is absent)</ul>
-     *   <ul>route: VuFind route to build URL with (required if 'url' is absent)</ul>
-     *   <ul>routeParams: Parameters for route (optional)</ul>
-     *   <ul>queryString: Query params to append after building route (optional)</ul>
-     * </li>
-     *
-     * @return array
-     */
+      * Return an array of all OnlineHoldings from MARCRecord
+      * Field 981: for Links
+      * Field 980: for description
+      * Field 982: 
+      * 
+      * $txt = Text for displaying the link
+      * $url = url to OnlineContent
+      * $more = further description (PICA 4801)
+      * $tmp = ELS-gif for Higliting ELS Links
+      * 
+      * @return array
+      */
     public function getOnlineHoldings()
     {
       $retVal = [];
-        
-      $links = $this->getConditionalFieldArray('981', ['y', 'r', '1'], true, '|', ['2' => '31']);
+      
+      /* extract all LINKS form MARC 981 */
+      $links = $this->getConditionalFieldArray('981', ['1', 'y', 'r', 'w'], true, '|', ['2' => '31']);
       $more = "";
 
       if ( !empty($links) ){
+        /* what kind of LINKS do we have?
+         * is there more Information in MARC 980 / 982?
+         */
         foreach ( $links as $link ) {
           list($id, $txt, $url) = explode("|", $link);
+          
+          /* seems that the real LINK is in 981y if 981r or w is empty... */
           if ( empty($txt) ) {
             $txt = $url;
           }
+          /* ... and vice versa */
           if ( empty($url) ) {
             $url = $txt;
+            $txt = "fulltext";
           }
+
+          /* do we have a picture? f.e. ELS-gif */
+          if ( substr($txt, -3) == "gif" ) {
+            $retVal[$id] = $txt;
+            continue;
+          }
+          
+          /* Now, we are ready to extract extra-information */
           $details = $this->getConditionalFieldArray('980', ['g', 'k'], true, '|', ['2' => '31', '1' => $id]);
           $corporates = $this->getConditionalFieldArray('982', ['a'], true, '|', ['2' => '31', '1' => $id]);
           
@@ -483,10 +499,20 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
               $more .= $corporate."<br>";
             }
           }
-          $retVal[] = $txt . "|" . $url . "|" . $more;
+          
+          /* extract Info/Links with same ID
+           * thats the case, if we have an ELS-gif,
+           * so we assume, that the gif is set-up before.
+           * f.e.
+           * 981 |2 31  |1 00  |w http://kataloge.thulb.uni-jena.de/img_psi/2.0/logos/eLS.gif 
+           * 981 |2 31  |1 00  |y Volltext  |w http://mybib.thulb.uni-jena.de/els/browser/open/557127483  
+           */
+          
+          $tmp = $retVal[$id];
+          $retVal[$id] = $txt . "|" . $url . "|" . $more . "|" . $tmp;
         }
       } else {
-        $retVal = $links;
+        $retVal = "";
       }
       
 
