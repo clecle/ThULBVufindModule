@@ -420,6 +420,8 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      *    Leader 007 01 = r
      * @return boolean
      * 
+     * @deprecated
+     * 
      */
     public function isOnlineOnlyRecord()
     {
@@ -468,7 +470,13 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
          */
         foreach ( $links as $link ) {
           list($id, $txt, $url) = explode("|", $link);
-          
+       
+          /* do we have a picture? f.e. ELS-gif */
+          if ( substr($txt, -3) == "gif" ) {
+            $retVal[$id] = $txt;
+            continue;
+          }
+
           /* seems that the real LINK is in 981y if 981r or w is empty... */
           if ( empty($txt) ) {
             $txt = $url;
@@ -479,12 +487,6 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             $txt = "fulltext";
           }
 
-          /* do we have a picture? f.e. ELS-gif */
-          if ( substr($txt, -3) == "gif" ) {
-            $retVal[$id] = $txt;
-            continue;
-          }
-          
           /* Now, we are ready to extract extra-information */
           $details = $this->getConditionalFieldArray('980', ['g', 'k'], true, '|', ['2' => '31', '1' => $id]);
           $corporates = $this->getConditionalFieldArray('982', ['a'], true, '|', ['2' => '31', '1' => $id]);
@@ -507,15 +509,12 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
            * 981 |2 31  |1 00  |w http://kataloge.thulb.uni-jena.de/img_psi/2.0/logos/eLS.gif 
            * 981 |2 31  |1 00  |y Volltext  |w http://mybib.thulb.uni-jena.de/els/browser/open/557127483  
            */
-          
           $tmp = $retVal[$id];
           $retVal[$id] = $txt . "|" . $url . "|" . $more . "|" . $tmp;
         }
       } else {
         $retVal = "";
       }
-      
-
       return $retVal;
     }
 }
