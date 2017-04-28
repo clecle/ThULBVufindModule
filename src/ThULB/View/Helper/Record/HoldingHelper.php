@@ -35,6 +35,7 @@ class HoldingHelper extends AbstractHelper
                     if (isset($itemRow['ILLRequestLink']) && $itemRow['ILLRequestLink']) {
                         $availabilityString .= '<a class="' . ($checkILLRequest ? 'checkILLRequest ' : '') . 'placeILLRequest" data-lightbox href="' . $this->view->recordLink()->getRequestUrl($itemRow['ILLRequestLink']) . '"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;' . $this->view->transEsc($checkILLRequest ? "ill_request_check_text" : "ill_request_place_text") . '</a>';
                     }
+                    /* Nicht leihbar? Also Lesesaal! */
                     if ( !in_array("loan", $itemRow['services']) ) {
                       $availabilityString .= "<br>" . $this->view->transEsc('reading_room_only');
                     }
@@ -86,6 +87,19 @@ class HoldingHelper extends AbstractHelper
     
     public function getCallNumber(&$item)
     {
+      /* 
+       * extrahiere den Standort ( der String vorm ersten : )
+       * Falls kein Doppelpunkt vorkommt, gib die Signatur unverändert weiter
+       */
+      /*list($standort, $callnumber) = explode(":", $item['callnumber'], 2);
+      if ( $callnumber ) {
+        $retVal = $callnumber;
+      } else {
+        $retVal = $item['callnumber'];
+      }
+      
+      return $retVal ?: '';
+      */
       return $item['callnumber'];
     }
     

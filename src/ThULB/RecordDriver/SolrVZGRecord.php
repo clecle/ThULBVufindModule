@@ -21,17 +21,32 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     }
 
     /**
-     * Get the full title of the record.
+     * Get the full title of the record rendered in ISBD
+     * title_short : title_sub
      *
      * @return string
      */
+    /*public function getTitle()
+    {
+      $title = isset($this->fields['title_short']) ?
+        is_array($this->fields['title_short']) ?
+        $this->fields['title_short'][0] : $this->fields['title_short'] : '';
+      $title .= ' : ';
+      $title .= isset($this->fields['title_sub']) ?
+        is_array($this->fields['title_sub']) ?
+        $this->fields['title_sub'][0] : $this->fields['title_sub'] : '';
+
+      return $title;
+    }*/
+
+    
     public function getTitle()
     {
-        return isset($this->fields['title']) ?
-            is_array($this->fields['title']) ?
-            $this->fields['title'][0] : $this->fields['title'] : '';
+      return isset($this->fields['title']) ?
+        is_array($this->fields['title']) ?
+        $this->fields['title'][0] : $this->fields['title'] : '';
     }
-
+    
     /**
      * Get the subtitle of the record.
      *
@@ -462,13 +477,13 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
       
       /* extract all LINKS form MARC 981 */
       $links = $this->getConditionalFieldArray('981', ['1', 'y', 'r', 'w'], true, '|', ['2' => '31']);
-      $more = "";
 
       if ( !empty($links) ){
         /* what kind of LINKS do we have?
          * is there more Information in MARC 980 / 982?
          */
         foreach ( $links as $link ) {
+          $more = "";
           list($id, $txt, $url) = explode("|", $link);
        
           /* do we have a picture? f.e. ELS-gif */
@@ -488,8 +503,8 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
           }
 
           /* Now, we are ready to extract extra-information */
-          $details = $this->getConditionalFieldArray('980', ['g', 'k'], true, '|', ['2' => '31', '1' => $id]);
-          $corporates = $this->getConditionalFieldArray('982', ['a'], true, '|', ['2' => '31', '1' => $id]);
+          $details = $this->getConditionalFieldArray('980', ['g', 'k'], false, '', ['2' => '31', '1' => $id]);
+          $corporates = $this->getConditionalFieldArray('982', ['a'], false, '', ['2' => '31', '1' => $id]);
           
           if ( !empty($details) ) {
             foreach ($details as $detail) {
