@@ -91,7 +91,7 @@ class HoldingHelper extends AbstractHelper
        * extrahiere den Standort ( der String vorm ersten : )
        * Falls kein Doppelpunkt vorkommt, gib die Signatur unverändert weiter
        */
-      /*list($standort, $callnumber) = explode(":", $item['callnumber'], 2);
+      list($standort, $callnumber) = explode(":", $item['callnumber'], 2);
       if ( $callnumber ) {
         $retVal = $callnumber;
       } else {
@@ -99,8 +99,6 @@ class HoldingHelper extends AbstractHelper
       }
       
       return $retVal ?: '';
-      */
-      return $item['callnumber'];
     }
     
     public function getHoldingComments(&$marcRecord, &$item)

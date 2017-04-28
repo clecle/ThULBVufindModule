@@ -20,26 +20,6 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             $this->fields['title_short'][0] : $this->fields['title_short'] : '';
     }
 
-    /**
-     * Get the full title of the record rendered in ISBD
-     * title_short : title_sub
-     *
-     * @return string
-     */
-    /*public function getTitle()
-    {
-      $title = isset($this->fields['title_short']) ?
-        is_array($this->fields['title_short']) ?
-        $this->fields['title_short'][0] : $this->fields['title_short'] : '';
-      $title .= ' : ';
-      $title .= isset($this->fields['title_sub']) ?
-        is_array($this->fields['title_sub']) ?
-        $this->fields['title_sub'][0] : $this->fields['title_sub'] : '';
-
-      return $title;
-    }*/
-
-    
     public function getTitle()
     {
       $title = isset($this->fields['title']) ?
