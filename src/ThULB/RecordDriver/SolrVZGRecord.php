@@ -576,4 +576,22 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
 
       return $retVal;
     }
+    
+    /**
+     * Get the Hierarchy Type (false if none)
+     *
+     * @return string|bool
+     */
+    public function getHierarchyType()
+    {
+        $hierarchyType = isset($this->fields['hierarchytype'])
+            ? $this->fields['hierarchytype'] : false;
+        if (!$hierarchyType) {
+            $hierarchyType = isset($this->mainConfig->Hierarchy->driver)
+                ? $this->mainConfig->Hierarchy->driver : false;
+        }
+        return $hierarchyType;
+        
+        return false;
+    }
 }
