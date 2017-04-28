@@ -338,6 +338,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         $primaryFields = [
             '440' => ['a', 'p'],
             '800' => ['a', 'b', 'c', 'd', 'f', 'p', 'q', 't'],
+            '810' => ['a', 'p'],
             '830' => ['a', 'p']];
         $matches = $this->getSeriesFromMARC($primaryFields);
         if (!empty($matches)) {
@@ -353,6 +354,63 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
 
         // Still no results found?  Resort to the Solr-based method just in case!
         return parent::getSeries();
+    }
+
+    /**
+     * Support method for getSeries() -- given a field specification, look for
+     * series information in the MARC record.
+     *
+     * @param array $fieldInfo Associative array of field => subfield information
+     * (used to find series name)
+     *
+     * @return array
+     */
+    protected function getSeriesFromMARC($fieldInfo)
+    {
+        $matches = [];
+
+        // Loop through the field specification....
+        foreach ($fieldInfo as $field => $subfields) {
+            // Did we find any matching fields?
+            $series = $this->getMarcRecord()->getFields($field);
+            if (is_array($series)) {
+                foreach ($series as $currentField) {
+                    // Can we find a name using the specified subfield list?
+                    $name = $this->getSubfieldArray($currentField, $subfields);
+                    if (!isset($name[0])) {
+                        $volume = $this->getSubfieldArray($currentField, ['v']);
+                        $name = $this->getConditionalFieldArray('490', ['a'], true, ' ', ['v' => $volume[0]]);
+                    }
+                    
+                    if (isset($name[0])) {
+                        $currentArray = ['name' => $name[0]];
+
+                        // Can we find a number in subfield v?  (Note that number is
+                        // always in subfield v regardless of whether we are dealing
+                        // with 440, 490, 800 or 830 -- hence the hard-coded array
+                        // rather than another parameter in $fieldInfo).
+                        $number
+                            = $this->getSubfieldArray($currentField, ['v']);
+                        if (isset($number[0])) {
+                            $currentArray['number'] = $number[0];
+                        }
+                        
+                        $id = $this->getSubfieldArray($currentField, ['w'], false);
+                        foreach ($id as $rawId) {
+                            if (strpos($rawId, '(DE-601)') === 0) {
+                                $currentArray['id'] = substr($rawId, 8);
+                                break;
+                            }
+                        }
+
+                        // Save the current match:
+                        $matches[] = $currentArray;
+                    }
+                }
+            }
+        }
+
+        return $matches;
     }
     
     /**
