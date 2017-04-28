@@ -441,6 +441,16 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
 
       return false;
     }
+    
+    public function isNewsPaper()
+    {
+      $leader = $this->getMarcRecord()->getLeader();
+      if ( strtoupper($leader[7] ) == "S" ) {
+        return true;
+      }
+
+      return false;
+    }
 
      /**
       * Return an array of all OnlineHoldings from MARCRecord
