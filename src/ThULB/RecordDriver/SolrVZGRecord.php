@@ -22,13 +22,49 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
 
     public function getTitle()
     {
-      $title = isset($this->fields['title']) ?
-        is_array($this->fields['title']) ?
-        $this->fields['title'][0] : $this->fields['title'] : '';
-      if ($title == '') {
-        $title = $this->getFirstFieldValue('490', ['a']);
-      }
-      return $title;
+        $titleStatementField = $this->getMarcRecord()->getFields('245');
+        $seriesStatementField = $this->getMarcRecord()->getFields('490');
+        if ($titleStatementField) {
+            $subfields = $titleStatementField[0]->getSubfields();
+            $titleParts = [
+                    'a' => '',
+                    'b' => '',
+                    'n' => '',
+                    'p' => ''
+                ];
+            foreach ($subfields as $currentSubfield) {
+                if (array_key_exists($currentSubfield->getCode(), $titleParts)) {
+                    $titleParts[$currentSubfield->getCode()] =
+                        trim(preg_replace(
+                                    ['/^[:.]{1}/', '/[:.]{1}$/'],
+                                    '',
+                                    trim($currentSubfield->getData())
+                                ));
+                }
+            }
+           
+            $firstSeparator = ($titleParts['n'] && $titleParts['p']) ? ': ' : '';
+            $secondSeparator = (($titleParts['n'] || $titleParts['p']) && ($titleParts['a'] || $titleParts['b'])) ? '. ' : '';
+            $thirdSeparator = ($titleParts['a'] && $titleParts['b']) ? ' : ' : '';
+            
+            $title = $titleParts['n'] . $firstSeparator . $titleParts['p'] .
+                    $secondSeparator . $titleParts['a'] . $thirdSeparator . 
+                    $titleParts['b'];
+        } else if ($seriesStatementField) {
+            $subfields = $seriesStatementField[0]->getSubfields();
+            $titleParts = ['a' => '', 'v' => ''];
+            foreach ($subfields as $currentSubfield) {
+                if (array_key_exists($currentSubfield->getCode(), $titleParts)) {
+                    $titleParts[$currentSubfield->getCode()] = $currentSubfield->getData();
+                }
+            }
+            
+            $title = $titleParts['v'] . (($titleParts['a'] && $titleParts['v']) ? ': ' : '') . $titleParts['a'];
+        } else {
+            $title = parent::getTitle();
+        }
+        
+        return $title;
     }
     
     /**
