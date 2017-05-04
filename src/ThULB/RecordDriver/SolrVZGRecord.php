@@ -262,6 +262,24 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $this->getFirstFieldValue('255', ['e']);
     }
     
+    public function getReducedPublicationInfo()
+    {
+        $pubData['location'] = $this->getFirstFieldValue('264', ['a']) ?: '';
+        $pubData['publisher'] = $this->getFirstFieldValue('264', ['b']) ?: '';
+        $pubData['year'] = $this->getFirstFieldValue('264', ['c']) ?: '';
+        $pubData['edition'] = $this->getFirstFieldValue('250', ['a']) ?: '';
+        
+        $firstSeparator = ($pubData['location'] && $pubData['publisher']) ? ' : ' : '';
+        $secondSeparator = (($pubData['location'] || $pubData['publisher']) && ($pubData['year'] || $pubData['edition'])) ? ', ' : '';
+        $thirdSeparator = ($pubData['year']) ? '. ' : '';
+        
+        return $pubData['location'] . $firstSeparator .
+                $pubData['publisher'] . $secondSeparator .
+                $pubData['year'] . $thirdSeparator .
+                $pubData['edition'];
+                
+    }
+    
     /**
      * Returns the array element for the 'getAllRecordLinks' method
      *
