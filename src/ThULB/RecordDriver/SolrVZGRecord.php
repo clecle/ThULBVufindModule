@@ -35,11 +35,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             foreach ($subfields as $currentSubfield) {
                 if (array_key_exists($currentSubfield->getCode(), $titleParts)) {
                     $titleParts[$currentSubfield->getCode()] =
-                        trim(preg_replace(
-                                    ['/^[:.]{1}/', '/[:.]{1}$/'],
-                                    '',
-                                    trim($currentSubfield->getData())
-                                ));
+                                                    $currentSubfield->getData();
                 }
             }
            
