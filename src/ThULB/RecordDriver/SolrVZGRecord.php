@@ -15,9 +15,48 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     public function getShortTitle()
     {
-        return isset($this->fields['title_short']) ?
-            is_array($this->fields['title_short']) ?
-            $this->fields['title_short'][0] : $this->fields['title_short'] : '';
+        
+        $titleStatementField = $this->getMarcRecord()->getFields('245');
+        $seriesStatementField = $this->getMarcRecord()->getFields('490');
+        
+        if ($titleStatementField) {
+            $subfields = $titleStatementField[0]->getSubfields();
+            $titleParts = [
+                    'a' => '',
+                    'b' => ''
+                ];
+            foreach ($subfields as $currentSubfield) {
+                if (array_key_exists($currentSubfield->getCode(), $titleParts)) {
+                    $titleParts[$currentSubfield->getCode()] =
+                    //@todo: decide, if placeholders should be removed
+//                    $titleParts[$currentSubfield->getCode()] = 
+//                        $this->sanitizeMarcField($currentSubfield->getData());
+                                                    $currentSubfield->getData();
+                }
+            }
+            
+            $title = $titleParts['a'] . ($this->isSeparatorNeeded($titleParts['a'], $titleParts['b'], [':', '=']) ? ' : ' : '') . $titleParts['b'];
+        } else if ($seriesStatementField) {
+            $subfields = $seriesStatementField[0]->getSubfields();
+            $titleParts = ['a' => '', 'v' => ''];
+            foreach ($subfields as $currentSubfield) {
+                    //@todo: decide, if placeholders should be removed
+//                    $titleParts[$currentSubfield->getCode()] = 
+//                        $this->sanitizeMarcField($currentSubfield->getData());
+                if (array_key_exists($currentSubfield->getCode(), $titleParts)) {
+                    $titleParts[$currentSubfield->getCode()] = 
+                         $currentSubfield->getData();
+                }
+            }
+            
+            $title = $titleParts['v'] . (($titleParts['a'] && $titleParts['v']) ? ': ' : '') . $titleParts['a'];
+        } else {
+            $title = isset($this->fields['title_short']) ?
+                is_array($this->fields['title_short']) ?
+                $this->fields['title_short'][0] : $this->fields['title_short'] : '';
+        }
+        
+        return $title;
     }
 
     public function getTitle()
@@ -34,6 +73,9 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
                 ];
             foreach ($subfields as $currentSubfield) {
                 if (array_key_exists($currentSubfield->getCode(), $titleParts)) {
+                    //@todo: decide, if placeholders should be removed
+//                    $titleParts[$currentSubfield->getCode()] = 
+//                        $this->sanitizeMarcField($currentSubfield->getData());
                     $titleParts[$currentSubfield->getCode()] =
                                                     $currentSubfield->getData();
                 }
@@ -63,7 +105,9 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             
             $title = $titleParts['v'] . (($titleParts['a'] && $titleParts['v']) ? ': ' : '') . $titleParts['a'];
         } else {
-            $title = parent::getTitle();
+            $title = isset($this->fields['title']) ?
+                        is_array($this->fields['title']) ?
+                        $this->fields['title'][0] : $this->fields['title'] : '';
         }
         
         return $title;
