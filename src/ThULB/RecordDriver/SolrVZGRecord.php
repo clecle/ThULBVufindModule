@@ -39,9 +39,11 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
                 }
             }
            
-            $firstSeparator = ($titleParts['n'] && $titleParts['p']) ? ': ' : '';
-            $secondSeparator = (($titleParts['n'] || $titleParts['p']) && ($titleParts['a'] || $titleParts['b'])) ? '. ' : '';
-            $thirdSeparator = ($titleParts['a'] && $titleParts['b']) ? ' : ' : '';
+            $firstSeparator = $this->isSeparatorNeeded($titleParts['n'], $titleParts['p']) ? ': ' : '';
+            $secondSeparator = $this->isSeparatorNeeded($titleParts['n'] . $titleParts['p'], $titleParts['a'] . $titleParts['b']) ? '. ' : '';
+            //@todo: decide, if there should be a check for an existing separator inside the marc fields
+//            $thirdSeparator = $this->isSeparatorNeeded($titleParts['a'], $titleParts['b'], [':']) ? ' : ' : '';
+            $thirdSeparator = $this->isSeparatorNeeded($titleParts['a'], $titleParts['b']) ? ' : ' : '';
             
             $title = $titleParts['n'] . $firstSeparator . $titleParts['p'] .
                     $secondSeparator . $titleParts['a'] . $thirdSeparator . 
@@ -51,8 +53,11 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             $titleParts = ['a' => '', 'v' => ''];
             foreach ($subfields as $currentSubfield) {
                 if (array_key_exists($currentSubfield->getCode(), $titleParts)) {
+                    //@todo: decide, if placeholders should be removed
+//                    $titleParts[$currentSubfield->getCode()] = 
+//                        $this->sanitizeMarcField($currentSubfield->getData());
                     $titleParts[$currentSubfield->getCode()] = 
-                        $this->sanitizeMarcField($currentSubfield->getData());
+                         $currentSubfield->getData();
                 }
             }
             
@@ -273,8 +278,8 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         $pubData['year'] = $this->getFirstFieldValue('264', ['c']) ?: '';
         $pubData['edition'] = $this->getFirstFieldValue('250', ['a']) ?: '';
         
-        $firstSeparator = ($pubData['location'] && $pubData['publisher']) ? ' : ' : '';
-        $secondSeparator = (($pubData['location'] || $pubData['publisher']) && ($pubData['year'] || $pubData['edition'])) ? ', ' : '';
+        $firstSeparator = $this->isSeparatorNeeded($pubData['location'], $pubData['publisher']) ? ' : ' : '';
+        $secondSeparator = $this->isSeparatorNeeded($pubData['location'] . $pubData['publisher'], $pubData['year'] . $pubData['edition']) ? ', ' : '';
         $thirdSeparator = ($pubData['year']) ? '. ' : '';
         
         return $pubData['location'] . $firstSeparator .
@@ -283,6 +288,12 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
                 $pubData['edition'];
     }
     
+    /**
+     * Remove placeholders and other unwanted strings from MARC fields.
+     * 
+     * @param STRING $marcFieldString
+     * @return string
+     */
     protected function sanitizeMarcField($marcFieldString)
     {
         $cleanMarcField = $marcFieldString;
@@ -292,6 +303,33 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         }
         
         return $cleanMarcField;
+    }
+    
+    /**
+     * Checks, if there already is a separator inside strings, that have to be
+     * concatenated or if one of the strings is empty or not present.
+     * 
+     * @param string|null|boolean $firstPart
+     * @param string|null|boolean $secondPart
+     * @param array $checkFor
+     */
+    protected function isSeparatorNeeded($firstPart, $secondPart, $checkFor = [])
+    {
+        $separatorNeeded = is_string($firstPart) && is_string($secondPart) &&
+                                strlen($firstPart) && strlen($secondPart);
+        
+        if ($separatorNeeded) {
+            foreach ($checkFor as $includedSeparator) {
+                if (substr(rtrim($firstPart), -1) == $includedSeparator
+                    || substr(ltrim($secondPart), 0, 1) == $includedSeparator
+                ) {
+                    $separatorNeeded = false;
+                    break;
+                }
+            }
+        }
+        
+        return $separatorNeeded;
     }
 
 
