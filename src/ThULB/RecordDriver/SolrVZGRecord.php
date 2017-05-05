@@ -51,7 +51,8 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             $titleParts = ['a' => '', 'v' => ''];
             foreach ($subfields as $currentSubfield) {
                 if (array_key_exists($currentSubfield->getCode(), $titleParts)) {
-                    $titleParts[$currentSubfield->getCode()] = $currentSubfield->getData();
+                    $titleParts[$currentSubfield->getCode()] = 
+                        $this->sanitizeMarcField($currentSubfield->getData());
                 }
             }
             
@@ -280,9 +281,20 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
                 $pubData['publisher'] . $secondSeparator .
                 $pubData['year'] . $thirdSeparator .
                 $pubData['edition'];
-                
     }
     
+    protected function sanitizeMarcField($marcFieldString)
+    {
+        $cleanMarcField = $marcFieldString;
+        
+        if ($marcFieldString === '[...]') {
+            $cleanMarcField = '';
+        }
+        
+        return $cleanMarcField;
+    }
+
+
     /**
      * Returns the array element for the 'getAllRecordLinks' method
      *
