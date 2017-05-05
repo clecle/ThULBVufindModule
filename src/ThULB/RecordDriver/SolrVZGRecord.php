@@ -258,6 +258,13 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $this->getFirstFieldValue('255', ['e']);
     }
     
+    /**
+     * Generates a single line with basic publication information including the
+     * first location of the publication, the publisher, the year and the 
+     * edition.
+     * 
+     * @return String
+     */
     public function getReducedPublicationInfo()
     {
         $pubData['location'] = $this->getFirstFieldValue('264', ['a']) ?: '';
