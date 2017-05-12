@@ -15,42 +15,10 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     public function getShortTitle()
     {
+        $shortTitle = $this->getFormattedMarcData('245a : 245b') ?: $this->getFormattedMarcData('490v: 490a');
         
-        $titleStatementField = $this->getMarcRecord()->getFields('245');
-        $seriesStatementField = $this->getMarcRecord()->getFields('490');
-        
-        if ($titleStatementField) {
-            $subfields = $titleStatementField[0]->getSubfields();
-            $titleParts = [
-                    'a' => '',
-                    'b' => ''
-                ];
-            foreach ($subfields as $currentSubfield) {
-                if (array_key_exists($currentSubfield->getCode(), $titleParts)) {
-                    $titleParts[$currentSubfield->getCode()] =
-                    //@todo: decide, if placeholders should be removed
-//                    $titleParts[$currentSubfield->getCode()] = 
-//                        $this->sanitizeMarcField($currentSubfield->getData());
-                                                    $currentSubfield->getData();
-                }
-            }
-            
-            $title = $titleParts['a'] . ($this->isSeparatorNeeded($titleParts['a'], $titleParts['b'], [':', '=']) ? ' : ' : '') . $titleParts['b'];
-        } else if ($seriesStatementField) {
-            $subfields = $seriesStatementField[0]->getSubfields();
-            $titleParts = ['a' => '', 'v' => ''];
-            foreach ($subfields as $currentSubfield) {
-                    //@todo: decide, if placeholders should be removed
-//                    $titleParts[$currentSubfield->getCode()] = 
-//                        $this->sanitizeMarcField($currentSubfield->getData());
-                if (array_key_exists($currentSubfield->getCode(), $titleParts)) {
-                    $titleParts[$currentSubfield->getCode()] = 
-                         $currentSubfield->getData();
-                }
-            }
-            
-            $title = $titleParts['v'] . (($titleParts['a'] && $titleParts['v']) ? ': ' : '') . $titleParts['a'];
-        } else {
+        if ($shortTitle === '')
+        {
             $title = isset($this->fields['title_short']) ?
                 is_array($this->fields['title_short']) ?
                 $this->fields['title_short'][0] : $this->fields['title_short'] : '';
@@ -282,7 +250,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     /**
      * Get a formatted string from different MARC fields 
      * 
-     * @param string $format    Desribes the desired formatted output; MARC 
+     * @param string $format    Describes the desired formatted output; MARC 
      *                          fields and their subfields are coded with a 3
      *                          digit number that is immediately followed by the
      *                          character of the subfield (e.g. "260a");
@@ -300,7 +268,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      *                            the output is "264a, 264c. 250a"
      */
     protected function getFormattedMarcData($format)
-    {
+    {   
         // get all MARC data that is required (only first field values)
         $marcData = [];
         $marcFieldStrings = [];
@@ -321,8 +289,9 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         // parantheses:
         $format = preg_replace('/[^T\(\)]*F[^T\(\)]*/', '', $format);
         // Remove all content in parantheses, that doesn't represent existing
-        // Marc fields together with subsequent content
+        // Marc fields together with surrounding content
         $format = preg_replace('/[^T\(\)]*\([^T]*\)[^T\(\)]*/', '', $format);
+        // Transform to a valid formatter string
         $format = str_replace('T', '%s', str_replace('(', '', str_replace(')', '', $format)));
         
         return vsprintf($format, $marcData);
