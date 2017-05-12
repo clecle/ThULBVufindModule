@@ -61,51 +61,10 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
 
     public function getTitle()
     {
-        $titleStatementField = $this->getMarcRecord()->getFields('245');
-        $seriesStatementField = $this->getMarcRecord()->getFields('490');
-        if ($titleStatementField) {
-            $subfields = $titleStatementField[0]->getSubfields();
-            $titleParts = [
-                    'a' => '',
-                    'b' => '',
-                    'n' => '',
-                    'p' => ''
-                ];
-            foreach ($subfields as $currentSubfield) {
-                if (array_key_exists($currentSubfield->getCode(), $titleParts)) {
-                    //@todo: decide, if placeholders should be removed
-//                    $titleParts[$currentSubfield->getCode()] = 
-//                        $this->sanitizeMarcField($currentSubfield->getData());
-                    $titleParts[$currentSubfield->getCode()] =
-                                                    $currentSubfield->getData();
-                }
-            }
-           
-            $firstSeparator = $this->isSeparatorNeeded($titleParts['n'], $titleParts['p']) ? ': ' : '';
-            $secondSeparator = $this->isSeparatorNeeded($titleParts['n'] . $titleParts['p'], $titleParts['a'] . $titleParts['b']) ? '. ' : '';
-            //@todo: decide, if there should be a check for an existing separator inside the marc fields
-//            $thirdSeparator = $this->isSeparatorNeeded($titleParts['a'], $titleParts['b'], [':']) ? ' : ' : '';
-            $thirdSeparator = $this->isSeparatorNeeded($titleParts['a'], $titleParts['b']) ? ' : ' : '';
-            
-            $title = $titleParts['n'] . $firstSeparator . $titleParts['p'] .
-                    $secondSeparator . $titleParts['a'] . $thirdSeparator . 
-                    $titleParts['b'];
-        } else if ($seriesStatementField) {
-            $subfields = $seriesStatementField[0]->getSubfields();
-            $titleParts = ['a' => '', 'v' => ''];
-            foreach ($subfields as $currentSubfield) {
-                if (array_key_exists($currentSubfield->getCode(), $titleParts)) {
-                    //@todo: decide, if placeholders should be removed
-//                    $titleParts[$currentSubfield->getCode()] = 
-//                        $this->sanitizeMarcField($currentSubfield->getData());
-                    $titleParts[$currentSubfield->getCode()] = 
-                         $currentSubfield->getData();
-                }
-            }
-            
-            $title = $titleParts['v'] . (($titleParts['a'] && $titleParts['v']) ? ': ' : '') . $titleParts['a'];
-        } else {
-            $title = isset($this->fields['title']) ?
+        $title = $this->getFormattedMarcData('(245n: 245p). (245a : 245b)') ?: $this->getFormattedMarcData('490v: 490a');
+        
+        if ($title === '') {
+            isset($this->fields['title']) ?
                         is_array($this->fields['title']) ?
                         $this->fields['title'][0] : $this->fields['title'] : '';
         }
@@ -317,21 +276,59 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     public function getReducedPublicationInfo()
     {
-        $pubData['location'] = $this->getFirstFieldValue('264', ['a']) ?: '';
-        $pubData['publisher'] = $this->getFirstFieldValue('264', ['b']) ?: '';
-        $pubData['year'] = $this->getFirstFieldValue('264', ['c']) ?: '';
-        $pubData['edition'] = $this->getFirstFieldValue('250', ['a']) ?: '';
-        
-        $firstSeparator = $this->isSeparatorNeeded($pubData['location'], $pubData['publisher']) ? ' : ' : '';
-        $secondSeparator = $this->isSeparatorNeeded($pubData['location'] . $pubData['publisher'], $pubData['year'] . $pubData['edition']) ? ', ' : '';
-        $thirdSeparator = ($pubData['year']) ? '. ' : '';
-        
-        return $pubData['location'] . $firstSeparator .
-                $pubData['publisher'] . $secondSeparator .
-                $pubData['year'] . $thirdSeparator .
-                $pubData['edition'];
+        return $this->getFormattedMarcData('(((264a : 264b), 264c). 250a)');
     }
     
+    /**
+     * Get a formatted string from different MARC fields 
+     * 
+     * @param string $format    Desribes the desired formatted output; MARC 
+     *                          fields and their subfields are coded with a 3
+     *                          digit number that is immediately followed by the
+     *                          character of the subfield (e.g. "260a");
+     *                          to make hints for the separator priority in case
+     *                          of missing MARC fields, simple parentheses are
+     *                          used - if parantheses are part of the output
+     *                          string, they have to be escaped with a backslash
+     *                          ("\"); examples:
+     *                          - "264a : 264b, 264c. 250a": no information for
+     *                            separator priority - they are all treated as
+     *                            postfix; if e.g 264b is missing, the output is 
+     *                            "264a : 264c. 250a"
+     *                          - "((264a : 264b), 264c). 250a": the evaluation 
+     *                            order is provided; if e.g. 264b is missing,
+     *                            the output is "264a, 264c. 250a"
+     */
+    protected function getFormattedMarcData($format)
+    {
+        // get all MARC data that is required (only first field values)
+        $marcData = [];
+        $marcFieldStrings = [];
+        preg_match_all('/[\d]{3}[a-z]{1}/', $format, $marcFieldStrings, PREG_OFFSET_CAPTURE);
+        foreach ($marcFieldStrings[0] as $i => $marcFieldInfo) {
+            $fieldNumber = substr($marcFieldInfo[0], 0, 3);
+            $subfieldChar = substr($marcFieldInfo[0], 3);
+            $value = $this->getFirstFieldValue($fieldNumber, [$subfieldChar]);
+            if (!is_null($value)) {
+                $marcData[$fieldNumber . $subfieldChar] = $value;
+                $format = str_replace($fieldNumber . $subfieldChar, 'T', $format);
+            } else {
+                $format = str_replace($fieldNumber . $subfieldChar, 'F', $format);
+            }
+        }
+        
+        // Eliminate all missing fields and surrounding content inside the
+        // parantheses:
+        $format = preg_replace('/[^T\(\)]*F[^T\(\)]*/', '', $format);
+        // Remove all content in parantheses, that doesn't represent existing
+        // Marc fields together with subsequent content
+        $format = preg_replace('/[^T\(\)]*\([^T]*\)[^T\(\)]*/', '', $format);
+        $format = str_replace('T', '%s', str_replace('(', '', str_replace(')', '', $format)));
+        
+        return vsprintf($format, $marcData);
+    }
+    
+
     /**
      * Remove placeholders and other unwanted strings from MARC fields.
      * 
