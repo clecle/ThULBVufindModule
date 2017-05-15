@@ -15,16 +15,19 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     public function getShortTitle()
     {
-        $shortTitle = $this->getFormattedMarcData('245a : 245b') ?: $this->getFormattedMarcData('490v: 490a');
+        $shortTitle = $this->getFormattedMarcData(
+                '245a : 245b',
+                [' = ',' =', '= ', ' : ', ' :', ': ']
+            ) ?: $this->getFormattedMarcData('490v: 490a');
         
         if ($shortTitle === '')
         {
-            $title = isset($this->fields['title_short']) ?
+            $shortTitle = isset($this->fields['title_short']) ?
                 is_array($this->fields['title_short']) ?
                 $this->fields['title_short'][0] : $this->fields['title_short'] : '';
         }
         
-        return $title;
+        return $shortTitle;
     }
 
     public function getTitle()
@@ -256,9 +259,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      *                          character of the subfield (e.g. "260a");
      *                          to make hints for the separator priority in case
      *                          of missing MARC fields, simple parentheses are
-     *                          used - if parantheses are part of the output
-     *                          string, they have to be escaped with a backslash
-     *                          ("\"); examples:
+     *                          used; examples:
      *                          - "264a : 264b, 264c. 250a": no information for
      *                            separator priority - they are all treated as
      *                            postfix; if e.g 264b is missing, the output is 
@@ -267,7 +268,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      *                            order is provided; if e.g. 264b is missing,
      *                            the output is "264a, 264c. 250a"
      */
-    protected function getFormattedMarcData($format)
+    protected function getFormattedMarcData($format, $predefSeparators = [])
     {   
         // get all MARC data that is required (only first field values)
         $marcData = [];
@@ -279,7 +280,17 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             $value = $this->getFirstFieldValue($fieldNumber, [$subfieldChar]);
             if (!is_null($value)) {
                 $marcData[$fieldNumber . $subfieldChar] = $value;
-                $format = str_replace($fieldNumber . $subfieldChar, 'T', $format);
+                $replacement = 'T';
+                // check for separators in the marc field and marc the separator
+                // in the format string as removable
+                foreach ($predefSeparators as $separator) {
+                    if (substr($value, 0, strlen($separator)) === $separator) {
+                        $replacement = 'ST';
+                    } else if ((substr($value, -strlen($separator)) === $separator)) {
+                        $replacement = 'TS';
+                    }
+                }
+                $format = str_replace($fieldNumber . $subfieldChar, $replacement, $format);
             } else {
                 $format = str_replace($fieldNumber . $subfieldChar, 'F', $format);
             }
@@ -291,57 +302,14 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         // Remove all content in parantheses, that doesn't represent existing
         // Marc fields together with surrounding content
         $format = preg_replace('/[^T\(\)]*\([^T]*\)[^T\(\)]*/', '', $format);
+        // Remove separators for fields, where they are given with the field
+        // content
+        $format = preg_replace('/([^T\(\)]+S)|(S[^T\(\)]+)/', ' ', $format);
         // Transform to a valid formatter string
         $format = str_replace('T', '%s', str_replace('(', '', str_replace(')', '', $format)));
         
         return vsprintf($format, $marcData);
     }
-    
-
-    /**
-     * Remove placeholders and other unwanted strings from MARC fields.
-     * 
-     * @param STRING $marcFieldString
-     * @return string
-     */
-    protected function sanitizeMarcField($marcFieldString)
-    {
-        $cleanMarcField = $marcFieldString;
-        
-        if ($marcFieldString === '[...]') {
-            $cleanMarcField = '';
-        }
-        
-        return $cleanMarcField;
-    }
-    
-    /**
-     * Checks, if there already is a separator inside strings, that have to be
-     * concatenated or if one of the strings is empty or not present.
-     * 
-     * @param string|null|boolean $firstPart
-     * @param string|null|boolean $secondPart
-     * @param array $checkFor
-     */
-    protected function isSeparatorNeeded($firstPart, $secondPart, $checkFor = [])
-    {
-        $separatorNeeded = is_string($firstPart) && is_string($secondPart) &&
-                                strlen($firstPart) && strlen($secondPart);
-        
-        if ($separatorNeeded) {
-            foreach ($checkFor as $includedSeparator) {
-                if (substr(rtrim($firstPart), -1) == $includedSeparator
-                    || substr(ltrim($secondPart), 0, 1) == $includedSeparator
-                ) {
-                    $separatorNeeded = false;
-                    break;
-                }
-            }
-        }
-        
-        return $separatorNeeded;
-    }
-
 
     /**
      * Returns the array element for the 'getAllRecordLinks' method
