@@ -282,11 +282,11 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         
         $partInfo = '';
         for ($i = 0; $i < $numOfEntries; $i++) {
-            $partInfo .= ($i > 0) ? ' ; ' : '';
             $n = (isset($nSubfields[$i]) && $nSubfields[$i] !== '[...]') ? $nSubfields[$i] : '';
             $p = (isset($pSubfields[$i]) && $pSubfields[$i] !== '[...]') ? $pSubfields[$i] : '';
             $separator = ($n && $p) ? ': ' : '';
-            $partInfo .= $n . $separator . $p;
+            $partInfo .= (($i > 0 && ($n || $p)) ? ' ; ' : '') . 
+                             $n . $separator . $p;
         }
         
         return $partInfo;
@@ -309,9 +309,9 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      *                          - "((264a : 264b), 264c). 250a": the evaluation 
      *                            order is provided; if e.g. 264b is missing,
      *                            the output is "264a, 264c. 250a"
-     * @param array $$predefSeparators An array of strings, that might occur in
-     *                                 the MARC field entries and make separators
-     *                                 in the format string obsolete
+     * @param array $predefSeparators An array of strings, that might occur in
+     *                                the MARC field entries and make separators
+     *                                in the format string obsolete
      */
     protected function getFormattedMarcData($format, $predefSeparators = [])
     {   
