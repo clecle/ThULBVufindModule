@@ -9,38 +9,61 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     const DNB_LINK_ID_PREFIX = 'DE-101';
     
     /**
+     * Short title of the record.
+     *
+     * @var string 
+     */
+    protected $shortTitle;
+    
+    /**
+     * Title of the record.
+     *
+     * @var string
+     */
+    protected $title;
+
+
+    /**
      * Get the short (pre-subtitle) title of the record.
      *
      * @return string
      */
     public function getShortTitle()
     {
-        $shortTitle = $this->getFormattedMarcData(
-                '245a : 245b',
-                [' = ',' =', '= ', ' : ', ' :', ': ']
-            ) ?: $this->getFormattedMarcData('490v: 490a');
-        
-        if ($shortTitle === '')
-        {
-            $shortTitle = isset($this->fields['title_short']) ?
-                is_array($this->fields['title_short']) ?
-                $this->fields['title_short'][0] : $this->fields['title_short'] : '';
+        if (is_null($this->shortTitle)) {
+            $shortTitle = $this->getFormattedMarcData(
+                    '245a : 245b',
+                    [' = ',' =', '= ', ' : ', ' :', ': ']
+                ) ?: $this->getFormattedMarcData('490v: 490a');
+
+            if ($shortTitle === '')
+            {
+                $shortTitle = isset($this->fields['title_short']) ?
+                    is_array($this->fields['title_short']) ?
+                    $this->fields['title_short'][0] : $this->fields['title_short'] : '';
+            }
+
+            $this->shortTitle = $shortTitle;
         }
         
-        return $shortTitle;
+        return $this->shortTitle;
     }
 
     public function getTitle()
     {
-        $title = $this->getFormattedMarcData('(245n: 245p). (245a : 245b)') ?: $this->getFormattedMarcData('490v: 490a');
-        
-        if ($title === '') {
-            isset($this->fields['title']) ?
-                        is_array($this->fields['title']) ?
-                        $this->fields['title'][0] : $this->fields['title'] : '';
+        if (is_null($this->title)) {
+            $title = $this->getFormattedMarcData('(245n: 245p). (245a : 245b)') ?: $this->getFormattedMarcData('490v: 490a');
+
+            if ($title === '') {
+                isset($this->fields['title']) ?
+                            is_array($this->fields['title']) ?
+                            $this->fields['title'][0] : $this->fields['title'] : '';
+            }
+
+            $this->title = $title;
         }
         
-        return $title;
+        return $this->title;
     }
     
     /**
@@ -267,6 +290,9 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      *                          - "((264a : 264b), 264c). 250a": the evaluation 
      *                            order is provided; if e.g. 264b is missing,
      *                            the output is "264a, 264c. 250a"
+     * @param array $$predefSeparators An array of strings, that might occur in
+     *                                 the MARC field entries and make separators
+     *                                 in the format string obsolete
      */
     protected function getFormattedMarcData($format, $predefSeparators = [])
     {   
