@@ -273,6 +273,25 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $this->getFormattedMarcData('(((264a : 264b), 264c). 250a)');
     }
     
+    public function getPartInfo()
+    {
+        $nSubfields = $this->getFieldArray('245', ['n'], false);
+        $pSubfields = $this->getFieldArray('245', ['p'], false);
+        
+        $numOfEntries = max([count($nSubfields), count($pSubfields)]);
+        
+        $partInfo = '';
+        for ($i = 0; $i < $numOfEntries; $i++) {
+            $partInfo .= ($i > 0) ? ' ; ' : '';
+            $n = (isset($nSubfields[$i]) && $nSubfields[$i] !== '[...]') ? $nSubfields[$i] : '';
+            $p = (isset($pSubfields[$i]) && $pSubfields[$i] !== '[...]') ? $pSubfields[$i] : '';
+            $separator = ($n && $p) ? ': ' : '';
+            $partInfo .= $n . $separator . $p;
+        }
+        
+        return $partInfo;
+    }
+    
     /**
      * Get a formatted string from different MARC fields 
      * 

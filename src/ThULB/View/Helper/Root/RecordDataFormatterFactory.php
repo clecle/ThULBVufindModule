@@ -40,6 +40,7 @@ class RecordDataFormatterFactory extends OrignalFactory
     public function getDefaultFullSpecs()
     {
         $spec = new SpecBuilder();
+        $spec->setLine('PartInfo', 'getPartInfo');
         $spec->setTemplateLine(
             'Published in', 'getContainerTitle', 'data-containerTitle.phtml'
         );
