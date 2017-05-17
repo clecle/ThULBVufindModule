@@ -37,6 +37,9 @@ return [
                 'factories' => [
                     'articlecl' => 'ThULB\RecordTab\Factory::getArticleCollectionList',
                     'nonarticlecl' => 'ThULB\RecordTab\Factory::getNonArticleCollectionList'
+                ],
+                'invokables' => [
+                    'staffviewcombined' => 'ThULB\RecordTab\StaffViewCombined'
                 ]
             ]
         ],
@@ -59,7 +62,8 @@ return [
                     'NonArticleCollectionList' => 'nonarticlecl',
                     'Description'   => null,
                     'Reviews' => null,
-                    'Excerpt' => null
+                    'Excerpt' => null,
+                    'Details' => 'staffviewcombined'
                 ],
                 'backgroundLoadedTabs' => ['ArticleCollectionList', 'NonArticleCollectionList']
             ],
