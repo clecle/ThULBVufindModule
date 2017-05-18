@@ -541,6 +541,39 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
 
         return $matches;
     }
+
+    /**
+     * Return an array of associative URL arrays with one or more of the following
+     * keys:
+     *
+     * <li>
+     *   <ul>desc: URL description text to display (optional)</ul>
+     *   <ul>url: fully-formed URL (required if 'route' is absent)</ul>
+     *   <ul>route: VuFind route to build URL with (required if 'url' is absent)</ul>
+     *   <ul>routeParams: Parameters for route (optional)</ul>
+     *   <ul>queryString: Query params to append after building route (optional)</ul>
+     * </li>
+     *
+     * @return array
+     */
+    public function getURLs()
+    {
+        $retVal = [];
+        
+        $urls = $this->getMarcRecord()->getFields('856');
+        foreach ($urls as $url) {
+            $address = $url->getSubfield('u');
+            $description = $url->getSubfield('y');
+            if ($address && $description) {
+                $retVal[] = [
+                        'url'   => $address->getData(),
+                        'desc'  => $description->getData()
+                    ];
+            }  
+        }
+
+        return $retVal;
+    }
     
     /**
      * Return an array of all values extracted from the specified field/subfield
