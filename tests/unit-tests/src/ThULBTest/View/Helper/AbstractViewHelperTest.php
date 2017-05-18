@@ -100,8 +100,8 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
         $helpers = [
 //            'auth' => new \VuFind\View\Helper\Root\Auth($this->getMockBuilder('VuFind\Auth\Manager')->disableOriginalConstructor()->getMock()),
             'context' => $context,
-//            'openUrl' => new \VuFind\View\Helper\Root\OpenUrl($context, []),
-//            'proxyUrl' => new \VuFind\View\Helper\Root\ProxyUrl(),
+            'openUrl' => new \VuFind\View\Helper\Root\OpenUrl($context, []),
+            'proxyUrl' => new \VuFind\View\Helper\Root\ProxyUrl(),
             'record' => new \VuFind\View\Helper\Root\Record(),
             'recordLink' => new \VuFind\View\Helper\Root\RecordLink($this->getMockBuilder('VuFind\Record\Router')->disableOriginalConstructor()->getMock()),
 //            'searchTabs' => $this->getMockBuilder('VuFind\View\Helper\Root\SearchTabs')->disableOriginalConstructor()->getMock(),
