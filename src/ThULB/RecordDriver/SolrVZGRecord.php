@@ -52,7 +52,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     public function getTitle()
     {
         if (is_null($this->title)) {
-            $title = $this->getFormattedMarcData('(245n: 245p). (245a : 245b)') ?: $this->getFormattedMarcData('490v: 490a');
+            $title = $this->getFormattedMarcData('245n: (245p. (245a : 245b))') ?: $this->getFormattedMarcData('490v: 490a');
 
             if ($title === '') {
                 isset($this->fields['title']) ?
