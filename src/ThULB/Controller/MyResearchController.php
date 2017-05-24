@@ -12,7 +12,6 @@ use VuFind\Controller\MyResearchController as OriginalController;
 class MyResearchController extends OriginalController
 {
     const ID_URI_PREFIX = 'http://uri.gbv.de/document/opac-de-27:ppn:';
-   
 
     /**
      * We don't use this action anymore; it is replaced by the loans action, that
@@ -20,11 +19,11 @@ class MyResearchController extends OriginalController
      *
      * @return mixed
      */
-    public function checkedoutAction()
+    public function holdsAction()
     {
-        return $this->redirect()->toRoute('default', ['controller' => 'myresearch', 'action' => 'loans']);
+        return $this->redirect()->toRoute('default', ['controller' => 'myresearch', 'action' => 'holdsAndSRR']);
     }
-
+    
     /**
      * We don't use this action anymore; it is replaced by the loans action, that
      * combines all items held by the patron and all provided items
@@ -33,15 +32,15 @@ class MyResearchController extends OriginalController
      */
     public function storageRetrievalRequestsAction()
     {
-        return $this->redirect()->toRoute('default', ['controller' => 'myresearch', 'action' => 'loans']);
+        return $this->redirect()->toRoute('default', ['controller' => 'myresearch', 'action' => 'holdsAndSRR']);
     }
 
     /**
-     * Send list of checked out books to view
+     * Send list of books that are provided for the user to view
      *
      * @return mixed
      */
-    public function loansAction()
+    public function providedAction()
     {
         // Stop now if the user does not have valid catalog credentials available:
         if (!is_array($patron = $this->catalogLogin())) {
@@ -66,7 +65,7 @@ class MyResearchController extends OriginalController
         $renewForm = false;
 
         // Get checked out item details:
-        $result = $catalog->getMyLoans($patron);
+        $result = $catalog->getMyProvidedItems($patron);
 
         // Get page size:
         $config = $this->getConfig();
@@ -114,6 +113,65 @@ class MyResearchController extends OriginalController
                 'hiddenTransactions'
             )
         );
+    }
+
+    /**
+     * Send list of holds to view
+     *
+     * @return mixed
+     */
+    public function holdsAndSRRAction()
+    {
+        // Stop now if the user does not have valid catalog credentials available:
+        if (!is_array($patron = $this->catalogLogin())) {
+            return $patron;
+        }
+
+        // Connect to the ILS:
+        $catalog = $this->getILS();
+
+        // Process cancel requests if necessary:
+        $cancelStatus = $catalog->checkFunction('cancelHolds', compact('patron'));
+        $view = $this->createViewModel();
+        $view->cancelResults = $cancelStatus
+            ? $this->holds()->cancelHolds($catalog, $patron) : [];
+        // If we need to confirm
+        if (!is_array($view->cancelResults)) {
+            return $view->cancelResults;
+        }
+
+        // By default, assume we will not need to display a cancel form:
+        $view->cancelForm = false;
+
+        // Get held item details:
+        $result = $catalog->getMyHoldsAndSRR($patron);
+        $recordList = [];
+        $this->holds()->resetValidation();
+        foreach ($result as $current) {
+            // Add cancel details if appropriate:
+            $current = $this->holds()->addCancelDetails(
+                $catalog, $current, $cancelStatus
+            );
+            if ($cancelStatus && $cancelStatus['function'] != "getCancelHoldLink"
+                && isset($current['cancel_details'])
+            ) {
+                // Enable cancel form if necessary:
+                $view->cancelForm = true;
+            }
+
+            // Build record driver:
+            $recordList[] = $this->getDriverForILSRecord($current);
+        }
+
+        // Get List of PickUp Libraries based on patron's home library
+        try {
+            $view->pickup = $catalog->getPickUpLocations($patron);
+        } catch (\Exception $e) {
+            // Do nothing; if we're unable to load information about pickup
+            // locations, they are not supported and we should ignore them.
+        }
+        $view->recordList = $recordList;
+        return $view;
     }
     
     /**

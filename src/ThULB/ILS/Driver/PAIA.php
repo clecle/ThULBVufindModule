@@ -23,12 +23,13 @@ class PAIA extends OriginalPAIA
      *
      * @return mixed Array of the patron's holds on success.
      */
-    public function getMyHolds($patron)
+    public function getMyHoldsAndSRR($patron)
     {
         // filters for getMyHolds are:
         // status = 1 - reserved (the document is not accessible for the patron yet,
         //              but it will be)
-        $filter = ['status' => [1]];
+        //          2 - ordered (the document is ordered by the patron)
+        $filter = ['status' => [1,2]];
         // get items-docs for given filters
         $items = $this->paiaGetItems($patron, $filter);
 
@@ -46,19 +47,17 @@ class PAIA extends OriginalPAIA
      *
      * @return array Array of the patron's transactions on success,
      */
-    public function getMyLoans($patron)
+    public function getMyProvidedItems($patron)
     {
         /* 
          * filters for getMyTransactions are:
-         * status = 2 - ordered (the document is ordered by the patron)
-         *          3 - held (the document is on loan by the patron)
-         *          4 - provided (the document is ready to be used by the patron)
+         * status = 4 - provided (the document is ready to be used by the patron)
          */
-        $filter = ['status' => [2, 3, 4]];
+        $filter = ['status' => [4]];
         // get items-docs for given filters
         $items = $this->paiaGetItems($patron, $filter);
 
-        return $this->mapPaiaItems($items, 'myLoansMapping');
+        return $this->mapPaiaItems($items, 'myProvidedItemsMapping');
     }
 
     /**
@@ -101,7 +100,7 @@ class PAIA extends OriginalPAIA
         return $profile;
     }
     
-    protected function myLoansMapping($items)
+    protected function myProvidedItemsMapping($items)
     {
         $results = [];
 
