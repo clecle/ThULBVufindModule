@@ -100,6 +100,25 @@ class PAIA extends OriginalPAIA
         return $profile;
     }
     
+    protected function myTransactionsMapping($items)
+    {
+        $result = parent::myTransactionsMapping($items);
+        
+        $sort = function ($a, $b) {
+            $dateA = date_create_from_format('d.m.Y', $a['dueTime']);
+            $dateB = date_create_from_format('d.m.Y', $b['dueTime']);
+
+            if ($dateA == $dateB) {
+                return 0;
+            }
+            return ($dateA < $dateB) ? -1 : 1;
+        };
+        
+        uasort($result, $sort);
+        
+        return $result;
+    }
+    
     protected function myProvidedItemsMapping($items)
     {
         $results = [];
@@ -192,6 +211,18 @@ class PAIA extends OriginalPAIA
 
             $results[] = $result;
         }
+        
+        $sort = function ($a, $b) {
+            $dateA = date_create_from_format('d.m.Y', $a['startTime']);
+            $dateB = date_create_from_format('d.m.Y', $b['startTime']);
+
+            if ($dateA == $dateB) {
+                return 0;
+            }
+            return ($dateA < $dateB) ? -1 : 1;
+        };
+        
+        uasort($result, $sort);
 
         return $results;
     }
