@@ -104,6 +104,12 @@ class PAIA extends OriginalPAIA
     {
         $result = parent::myTransactionsMapping($items);
         
+        foreach ($result as $index => $doc) {
+            if (isset($doc['callnumber'])) {
+                $result[$index]['callnumber'] = $this->getItemCallnumber(['label' => $doc['callnumber']]);
+            }
+        }
+        
         $sort = function ($a, $b) {
             $dateA = date_create_from_format('d.m.Y', $a['dueTime']);
             $dateB = date_create_from_format('d.m.Y', $b['dueTime']);
@@ -188,7 +194,7 @@ class PAIA extends OriginalPAIA
 
             // PAIA custom field
             // label (0..1) call number, shelf mark or similar item label
-            $result['callnumber'] = $this->getCallNumber($doc);
+            $result['callnumber'] = $this->getItemCallnumber($doc);
             
             // status: provided (the document is ready to be used by the patron)
             $result['available'] = $doc['status'] == 4 ? true : false;
