@@ -470,13 +470,14 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             '810' => ['a', 'p'],
             '830' => ['a', 'p']];
         $matches = $this->getSeriesFromMARC($primaryFields);
-        if (!empty($matches)) {
-            return $matches;
+        
+        // Now check 490 and add it only if it has only a name and no numbering:
+        foreach ($this->getSeriesFromMARC(['490' => ['a']]) as $match) {
+            if (array_keys($match) === ['name']) {
+                $matches[] = $match;
+            }
         }
-
-        // Now check 490 and display it only if 440/800/830 were empty:
-        $secondaryFields = ['490' => ['a']];
-        $matches = $this->getSeriesFromMARC($secondaryFields);
+        
         if (!empty($matches)) {
             return $matches;
         }
