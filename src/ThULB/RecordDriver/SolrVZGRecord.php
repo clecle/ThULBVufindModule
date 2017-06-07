@@ -273,6 +273,12 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $this->getFormattedMarcData('(((264a : 264b), 264c). 250a)');
     }
     
+    public function getDissertationNote()
+    {
+        $dissNote = $this->getFieldArray('502', ['a', 'b', 'c', 'd', 'g', 'o'], true, ', ');
+        return ($dissNote) ? ltrim($dissNote[0], '@') : null;
+    }
+    
     public function getPartInfo()
     {
         $nSubfields = $this->getFieldArray('245', ['n'], false);
