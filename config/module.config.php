@@ -41,6 +41,11 @@ return [
                 'invokables' => [
                     'staffviewcombined' => 'ThULB\RecordTab\StaffViewCombined'
                 ]
+            ],
+            'search_results' => [
+                'factories' => [
+                    'summon' => 'ThULB\Search\Results\Factory::getSummon'
+                ]
             ]
         ],
         'recorddriver_tabs' => [
