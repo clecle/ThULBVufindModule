@@ -54,8 +54,10 @@ class Results extends OriginalResults
         // FIX: manipulate params to use lightbox limit instead of standard
         //      facet limit in the current context
         $facetSetting = $params->get('facets');
-        $facetSetting[0] = preg_replace('/[\d]+$/', $limit, $facetSetting[0]);
-        $params->set('facets', $facetSetting);
+        if ($facetSetting) {
+            $facetSetting[0] = preg_replace('/[\d]+$/', $limit, $facetSetting[0]);
+            $params->set('facets', $facetSetting);
+        }
         
         $collection = $this->getSearchService()->search(
             'Summon', $query, 0, 0, $params
