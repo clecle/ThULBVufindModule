@@ -21,6 +21,13 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      * @var string
      */
     protected $title;
+    
+    /**
+     * The title of the record with highlighing markers
+     * 
+     * @var string
+     */
+    protected $highlightedTitle;
 
 
     /**
@@ -47,6 +54,28 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         }
         
         return $this->shortTitle;
+    }
+
+    /**
+     * Get a highlighted title string, if available.
+     *
+     * @return string
+     */
+    public function getHighlightedTitle()
+    {
+        if (is_null($this->highlightedTitle)) {
+            $this->highlightedTitle = parent::getHighlightedTitle();
+
+            // Apply highlighting to our customized title
+            if ($this->highlightedTitle) {
+                $this->highlightedTitle = $this->transferHighlighting(
+                        $this->getTitle(),
+                        $this->highlightedTitle
+                    );
+            }
+        }
+        
+        return $this->highlightedTitle;
     }
 
     public function getTitle()
@@ -771,5 +800,51 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $hierarchyType;
         
         return false;
+    }
+    
+    /**
+     * Apply highlightings in one string to another.
+     * 
+     * @param string $plainString
+     * @param string $highlightedString
+     * @return string
+     */
+    protected function transferHighlighting($plainString, $highlightedString)
+    {
+        $num = preg_match_all(
+                '/\{\{\{\{START_HILITE\}\}\}\}[^\{]+\{\{\{\{END_HILITE\}\}\}\}/',
+                $highlightedString,
+                $matches
+            );
+        $modifiedString = $plainString;
+        if ($num) {
+            $replacements = [];
+            foreach ($matches[0] as $match) {
+                $content = str_replace('{{{{END_HILITE}}}}', '', substr($match, 20));
+                $replacements[$content] = $match;
+            }
+
+            // sort array to have long keys first, because long search terms can
+            // contain a shorter one and therefor should be replaced first
+            $keySorter = function ($a, $b) {
+                return strlen($a) < strlen($b);
+            };
+            uksort($replacements, $keySorter);
+
+            // use a formatted string with argument swapping, to prevent
+            // replacements inside former replacements
+            $formatString = $plainString;
+            $formatArgs = [];
+            $i = 0;
+            foreach ($replacements as $search => $replace) {
+                $i++;
+                $formatString = str_replace($search, '%' . $i . '$s', $formatString);
+                $formatArgs[] = $replace;
+            }
+            
+            $modifiedString = vsprintf($formatString, $formatArgs);
+        }
+
+        return $modifiedString;
     }
 }
