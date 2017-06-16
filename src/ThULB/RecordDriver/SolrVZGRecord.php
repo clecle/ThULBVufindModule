@@ -306,7 +306,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     public function getReducedPublicationInfo()
     {
-        return $this->getFormattedMarcData('(((264a : 264b), 264c). 250a)');
+        return $this->getFormattedMarcData('250a - (((264a : 264b), 264c)');
     }
     
     public function getDissertationNote()
