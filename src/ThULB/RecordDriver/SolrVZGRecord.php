@@ -64,15 +64,14 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     public function getHighlightedTitle()
     {
         if (is_null($this->highlightedTitle)) {
-//            if (!$this->highlight && !is_array($this->highlight)) {
-//                return '';
-//            }
-//            
-//            $this->highlightedTitle = '';
-//            foreach ($this->highlightDetails as $highlightDetail) {
-//                $this->highlightedTitle .= implode('', $highlightDetail);
-//            }
-            $this->highlightedTitle = parent::getHighlightedTitle();
+            if (!$this->highlight && !is_array($this->highlight)) {
+                return '';
+            }
+            
+            $this->highlightedTitle = '';
+            foreach ($this->highlightDetails as $highlightDetail) {
+                $this->highlightedTitle .= implode('', $highlightDetail);
+            }
 
             // Apply highlighting to our customized title
             if ($this->highlightedTitle) {
