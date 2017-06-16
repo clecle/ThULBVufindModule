@@ -64,6 +64,14 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     public function getHighlightedTitle()
     {
         if (is_null($this->highlightedTitle)) {
+//            if (!$this->highlight && !is_array($this->highlight)) {
+//                return '';
+//            }
+//            
+//            $this->highlightedTitle = '';
+//            foreach ($this->highlightDetails as $highlightDetail) {
+//                $this->highlightedTitle .= implode('', $highlightDetail);
+//            }
             $this->highlightedTitle = parent::getHighlightedTitle();
 
             // Apply highlighting to our customized title
@@ -819,7 +827,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         $modifiedString = $plainString;
         if ($num) {
             $replacements = [];
-            foreach ($matches[0] as $match) {
+            foreach (array_unique($matches[0]) as $match) {
                 $content = str_replace('{{{{END_HILITE}}}}', '', substr($match, 20));
                 $replacements[$content] = $match;
             }
