@@ -8,7 +8,6 @@ class HoldingHelper extends AbstractHelper
 {  
     public function getAvailability(&$itemRow)
     {
-
       // AJAX Check record?
       $check = isset($itemRow['check']) && $itemRow['check'];
       $checkStorageRetrievalRequest = isset($itemRow['checkStorageRetrievalRequest']) && $itemRow['checkStorageRetrievalRequest'];
@@ -100,44 +99,6 @@ class HoldingHelper extends AbstractHelper
       }
       
       return $retVal ?: '';
-    }
-    
-    public function getHoldingComments(&$marcRecord, &$item)
-    {
-      /*
-       * Exemplarbezogene Daten auslesen
-       * 
-       * Zwei Ansätze denkbar:
-       * 1. aus 980$g Marc
-       *  Vorteil: genauer
-       *  Nachteil: u.U. nicht aktuell
-       * 2. about Text der DAIA-response
-       *  Vorteil: sofort sichtbar nach Änderung
-       *  Nachteil: nicht immer nur Pica Feld 4802? ungenau
-       * 
-       * Vorbedingung:
-       * 980 $2 == 31
-       * 980 $b == epn
-       * Ausgabe:
-       * 980 $g
-       * 980 $k und $l mit angeben?
-       */
-      
-
-      /*list($txt, $epn) = explode(":", $item['item_id']);*/
-      
-      $retVal = [];
-
-       /*
-       * Variante 2
-       * leider wird item > about nicht ausgeliefert > implementiert in ILS/Drive/PAIA.php
-       */
-
-       if ( !empty($item['about']) ) {
-           $retVal = array_merge($retVal, explode("\n", $item['about']));
-       }
-      
-      return $retVal;
     }
     
     public function getCallNumbers($holding)

@@ -750,6 +750,22 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     }
     
     /**
+      * Return an array of all Holding-Comments
+      * Field 980g
+      * 
+      * @return array
+      */
+    public function getHoldingComments($epn_str)
+    {
+      $retVal = [];
+      list($txt, $epn) = explode(":epn:", $epn_str);
+      /* extract all Comments form MARC 980 */
+      $comments = $this->getConditionalFieldArray('980', ['g'], true, '|', ['2' => '31', 'b' => $epn] );
+
+      return $comments;
+    }
+    
+    /**
      * Get the Hierarchy Type (false if none)
      *
      * @return string|bool
