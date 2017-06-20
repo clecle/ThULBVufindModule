@@ -9,6 +9,22 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     const DNB_LINK_ID_PREFIX = 'DE-101';
     
     /**
+     * Contains all separators that are often part of MARC field entries and
+     * should be eleminated, when custom formatting is applied
+     *
+     * @var array
+     */
+    protected static $defaultSeparators = [' = ',' =', '= ', ' : ', ' :', ': '];
+    
+    /**
+     * Contains all placeholders that are often used to fill missing MARC
+     * subfields and should be removed in the displayed string
+     * 
+     * @var array
+     */
+    protected static $defaultPlaceholders = ['[...]'];
+
+    /**
      * Short title of the record.
      *
      * @var string 
@@ -29,7 +45,6 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     protected $highlightedTitle;
 
-
     /**
      * Get the short (pre-subtitle) title of the record.
      *
@@ -38,10 +53,8 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     public function getShortTitle()
     {
         if (is_null($this->shortTitle)) {
-            $shortTitle = $this->getFormattedMarcData(
-                    '245a : 245b',
-                    [' = ',' =', '= ', ' : ', ' :', ': ']
-                ) ?: $this->getFormattedMarcData('490v: 490a');
+            $shortTitle = $this->getFormattedMarcData('245a : 245b') ?:
+                              $this->getFormattedMarcData('490v: 490a');
 
             if ($shortTitle === '')
             {
@@ -324,8 +337,8 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         
         $partInfo = '';
         for ($i = 0; $i < $numOfEntries; $i++) {
-            $n = (isset($nSubfields[$i]) && $nSubfields[$i] !== '[...]') ? $nSubfields[$i] : '';
-            $p = (isset($pSubfields[$i]) && $pSubfields[$i] !== '[...]') ? $pSubfields[$i] : '';
+            $n = (isset($nSubfields[$i]) && !in_array($nSubfields[$i], self::$defaultPlaceholders)) ? $nSubfields[$i] : '';
+            $p = (isset($pSubfields[$i]) && !in_array($pSubfields[$i], self::$defaultPlaceholders)) ? $pSubfields[$i] : '';
             $separator = ($n && $p) ? ': ' : '';
             $partInfo .= (($i > 0 && ($n || $p)) ? ' ; ' : '') . 
                              $n . $separator . $p;
@@ -351,11 +364,15 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      *                          - "((264a : 264b), 264c). 250a": the evaluation 
      *                            order is provided; if e.g. 264b is missing,
      *                            the output is "264a, 264c. 250a"
-     * @param array $predefSeparators An array of strings, that might occur in
-     *                                the MARC field entries and make separators
-     *                                in the format string obsolete
+     * @param boolean $removeSeparators MARC subfields may contain separators at
+     *                                  the beginning or at the end; Set to true,
+     *                                  when they should be removed from the
+     *                                  strings (default)
+     * @param boolean $ignorePlaceholders   Missing MARC subfields may contain
+     *                                      placeholder strings; Set to true, to
+     *                                      remove them
      */
-    protected function getFormattedMarcData($format, $predefSeparators = [])
+    protected function getFormattedMarcData($format, $removeSeparators = true, $ignorePlaceholders = true)
     {   
         // get all MARC data that is required (only first field values)
         $marcData = [];
@@ -365,16 +382,19 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             $fieldNumber = substr($marcFieldInfo[0], 0, 3);
             $subfieldChar = substr($marcFieldInfo[0], 3);
             $value = $this->getFirstFieldValue($fieldNumber, [$subfieldChar]);
+            $value = ($ignorePlaceholders && !is_null($value) && in_array($value, self::$defaultPlaceholders)) ? null : $value;
             if (!is_null($value)) {
                 $marcData[$fieldNumber . $subfieldChar] = $value;
                 $replacement = 'T';
                 // check for separators in the marc field and marc the separator
                 // in the format string as removable
-                foreach ($predefSeparators as $separator) {
-                    if (substr($value, 0, strlen($separator)) === $separator) {
-                        $replacement = 'ST';
-                    } else if ((substr($value, -strlen($separator)) === $separator)) {
-                        $replacement = 'TS';
+                if ($removeSeparators) {
+                    foreach (self::$defaultSeparators as $separator) {
+                        if (substr($value, 0, strlen($separator)) === $separator) {
+                            $replacement = 'ST';
+                        } else if ((substr($value, -strlen($separator)) === $separator)) {
+                            $replacement = 'TS';
+                        }
                     }
                 }
                 $format = str_replace($fieldNumber . $subfieldChar, $replacement, $format);
