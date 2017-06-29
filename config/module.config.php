@@ -12,6 +12,11 @@ return [
     ],
     'vufind' => [
         'plugin_managers' => [
+            'db_table' => [
+                'factories' => [
+                    'user' => 'ThULB\Db\Table\Factory::getUser'
+                ],
+            ],
             'hierarchy_treedataformatter' => [
                 'invokables' => [
                     'json' => 'ThULB\Hierarchy\TreeDataFormatter\Json'
