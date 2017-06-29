@@ -12,6 +12,19 @@ use VuFind\Controller\MyResearchController as OriginalController;
 class MyResearchController extends OriginalController
 {
     const ID_URI_PREFIX = 'http://uri.gbv.de/document/opac-de-27:ppn:';
+    
+    /**
+     * Send list of checked out books to view
+     *
+     * @return mixed
+     */
+    public function checkedoutAction()
+    {
+        $viewModel = parent::checkedoutAction();
+        $viewModel->setVariable('renewForm', true);
+        
+        return $viewModel;
+    }
 
     /**
      * We don't use this action anymore; it is replaced by the loans action, that
@@ -61,8 +74,8 @@ class MyResearchController extends OriginalController
             )
             : [];
 
-        // By default, assume we will not need to display a renewal form:
-        $renewForm = false;
+        // We always want to display a renewal form:
+        $renewForm = true;
 
         // Get checked out item details:
         $result = $catalog->getMyProvidedItems($patron);
@@ -92,12 +105,6 @@ class MyResearchController extends OriginalController
             $current = $this->renewals()->addRenewDetails(
                 $catalog, $current, $renewStatus
             );
-            if ($renewStatus && !isset($current['renew_link'])
-                && $current['renewable']
-            ) {
-                // Enable renewal form if necessary:
-                $renewForm = true;
-            }
 
             // Build record driver (only for the current visible page):
             if ($i >= $pageStart && $i <= $pageEnd) {
@@ -140,8 +147,8 @@ class MyResearchController extends OriginalController
             return $view->cancelResults;
         }
 
-        // By default, assume we will not need to display a cancel form:
-        $view->cancelForm = false;
+        // We always want to display a cancel form:
+        $view->cancelForm = true;
 
         // Get held item details:
         $result = $catalog->getMyHoldsAndSRR($patron);
@@ -152,12 +159,6 @@ class MyResearchController extends OriginalController
             $current = $this->holds()->addCancelDetails(
                 $catalog, $current, $cancelStatus
             );
-            if ($cancelStatus && $cancelStatus['function'] != "getCancelHoldLink"
-                && isset($current['cancel_details'])
-            ) {
-                // Enable cancel form if necessary:
-                $view->cancelForm = true;
-            }
 
             // Build record driver:
             $recordList[] = $this->getDriverForILSRecord($current);
