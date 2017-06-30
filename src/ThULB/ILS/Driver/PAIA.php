@@ -104,6 +104,13 @@ class PAIA extends OriginalPAIA
     {
         $result = parent::myTransactionsMapping($items);
         
+        // add queue information
+        foreach ($items as $i => $item) {
+            if ($item['queue']) {
+                $result[$i]['queue'] = $item['queue'];
+            }
+        }
+        
         foreach ($result as $index => $doc) {
             if (isset($doc['callnumber'])) {
                 $result[$index]['callnumber'] = $this->getItemCallnumber(['label' => $doc['callnumber']]);
