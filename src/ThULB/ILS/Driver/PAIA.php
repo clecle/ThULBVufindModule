@@ -11,8 +11,6 @@ use VuFind\ILS\Driver\PAIA as OriginalPAIA;
 class PAIA extends OriginalPAIA
 {
     const DAIA_DOCUMENT_ID_PREFIX = 'http://uri.gbv.de/document/opac-de-27:ppn:';
-    
-    const DAIA_UNKNOWN_CONTENT_VALUE = 'Unknown';
 
     /**
      * Get Patron Holds
@@ -274,13 +272,9 @@ class PAIA extends OriginalPAIA
      */
     protected function getItemCallnumber($item)
     {
-        $callnumber = isset($item['label']) && !empty($item['label']) ? $item['label'] : self::DAIA_UNKNOWN_CONTENT_VALUE;
+        $callnumber = isset($item['label']) && !empty($item['label']) ? $item['label'] : '';
         
-        if ($this->hasSignatureWithDepartmentId($item)) {
-            $callnumber = substr($callnumber, strpos($callnumber, ':') + 1);
-        }
-        
-        return $callnumber;
+        return $this->removeDepIdFromCallNumber($callnumber);
     }
     
     /**
@@ -348,7 +342,7 @@ class PAIA extends OriginalPAIA
                 $result_item = $this->getItemStatus($item) + $result_item;
                 // add result_item to the result array, if at least one relevant
                 // information is present
-                if ($result_item['callnumber'] !== self::DAIA_UNKNOWN_CONTENT_VALUE
+                if ($result_item['callnumber'] !== ''
                     || $result_item['about']
                 ) {
                     $result[] = $result_item;
@@ -357,6 +351,30 @@ class PAIA extends OriginalPAIA
         }
 
         return $result;
+    }
+
+    /**
+     * Get Holding
+     *
+     * This is responsible for retrieving the holding information of a certain
+     * record.
+     *
+     * @param string $id     The record id to retrieve the holdings for
+     * @param array  $patron Patron data
+     *
+     * @return array         On success, an associative array with the following
+     * keys: id, availability (boolean), status, location, reserve, callnumber,
+     * duedate, number, barcode.
+     */
+    public function getHolding($id, array $patron = null)
+    {
+        $holding = parent::getHolding($id, $patron);
+        
+        foreach ($holding as $index => $doc) {
+            $holding[$index]['callnumber'] = $this->removeDepIdFromCallNumber($doc['callnumber']);
+        }
+        
+        return $holding;
     }
 
     /**
@@ -406,25 +424,22 @@ class PAIA extends OriginalPAIA
     }
     
     /**
-     * Get if the signature in the label field starts with the department id.
+     * remove the storage label at the beginning of an item label
      * 
-     * @param array $item Array with DAIA item data
-     * @return boolean
+     * @param string $callNumber the call number of an item, which potentially
+     *                           begins with a storage id, separated by a colon
+     * @return string
      */
-    protected function hasSignatureWithDepartmentId(&$item)
+    protected function removeDepIdFromCallNumber($callNumber)
     {
-        $hasDepPrefix = false;
+        $sepPos = strpos($callNumber, ':');
         
-        if (isset($item['label'])
-            && !empty($item['label'])
-            && strpos($item['label'], ':')
-        ) {
-            $depID = strstr($item['label'], ':', true);
-            if (isset($this->config['DepartmentTitles'][$depID])) {
-                $hasDepPrefix = true;
-            }
+        if ($sepPos && isset($this->config['DepartmentTitles'][substr($callNumber, 0, $sepPos)])) {
+            return substr($callNumber, $sepPos + 1);
+        } else if (false === $sepPos && isset($this->config['DepartmentTitles'][$callNumber])) {
+            return '';
         }
         
-        return $hasDepPrefix;
+        return $callNumber;
     }
 }

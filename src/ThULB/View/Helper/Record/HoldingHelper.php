@@ -86,19 +86,8 @@ class HoldingHelper extends AbstractHelper
     }
     
     public function getCallNumber(&$item)
-    {
-      /* 
-       * extrahiere den Standort ( der String vorm ersten : )
-       * Falls kein Doppelpunkt vorkommt, gib die Signatur unverändert weiter
-       */
-      list($standort, $callnumber) = explode(":", $item['callnumber'], 2);
-      if ( $callnumber ) {
-        $retVal = $callnumber;
-      } else {
-        $retVal = $item['callnumber'];
-      }
-      
-      return $retVal ?: '';
+    { 
+      return $item['callnumber'] ?: '';
     }
     
     public function getCallNumbers($holding)
