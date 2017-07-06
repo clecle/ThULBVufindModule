@@ -241,7 +241,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     // Bibliographic citation from Marc field 510
     public function getBibliographicCitation()
     {
-        return $this->getFirstFieldValue('510', ['a']);
+        return implode(' ; ', $this->getFieldArray('510', ['a'], false));
     }
     
     /**
