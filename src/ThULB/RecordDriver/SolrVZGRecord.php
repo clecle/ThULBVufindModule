@@ -346,6 +346,50 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         
         return $partInfo;
     }
+
+    /**
+     * Get the main authors of the record.
+     *
+     * @return array
+     */
+    public function getPrimaryAuthors()
+    {
+        $author = $this->getFormattedMarcData('(100a (100b (\((100c, 100d)\)) 100g))');
+        return $author ? [$author] : [];
+    }
+    
+    /**
+     * Get the roles of the main authors of the record.
+     * 
+     * @return array
+     */
+    public function getPrimaryAuthorsRoles()
+    {
+        $roles = $this->getFirstFieldValue('100', ['4']);
+        return $role ? [$role] : [];
+    }
+    
+    /**
+     * Get the corporate authors (if any) for the record
+     * 
+     * @return array
+     */
+    public function getCorporateAuthors()
+    {
+        $author = $this->getFormattedMarcData('(110a (110b \((110c, 110d)\)( 110g)))');
+        return $author ? [$author] : [];
+    }
+    
+    /**
+     * Get the roles of corporate authors (if any) for the record. 
+     * 
+     * @return array
+     */
+    public function getCorporateAuthorsRoles()
+    {
+        $role = $this->getFirstFieldValue('110', ['4']);
+        return $role ? [$role] : [];
+    }
     
     /**
      * Get a formatted string from different MARC fields 
@@ -374,10 +418,14 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     protected function getFormattedMarcData($format, $removeSeparators = true, $ignorePlaceholders = true)
     {   
+        // keep all escaped parantheses by converting them to their html equivalent
+        $format = str_replace('\(', '&#40;', $format);
+        $format = str_replace('\)', '&#41;', $format);
+        
         // get all MARC data that is required (only first field values)
         $marcData = [];
         $marcFieldStrings = [];
-        preg_match_all('/[\d]{3}[a-z]{1}/', $format, $marcFieldStrings, PREG_OFFSET_CAPTURE);
+        preg_match_all('/[\d]{3}[\da-z]{1}/', $format, $marcFieldStrings, PREG_OFFSET_CAPTURE);
         foreach ($marcFieldStrings[0] as $i => $marcFieldInfo) {
             $fieldNumber = substr($marcFieldInfo[0], 0, 3);
             $subfieldChar = substr($marcFieldInfo[0], 3);
@@ -414,6 +462,11 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         $format = preg_replace('/([^T\(\)]+S)|(S[^T\(\)]+)/', ' ', $format);
         // Transform to a valid formatter string
         $format = str_replace('T', '%s', str_replace('(', '', str_replace(')', '', $format)));
+        
+        
+        // keep all escaped parantheses by converting them to their html equivalent
+        $format = str_replace('&#40;', '(', $format);
+        $format = str_replace('&#41;', ')', $format);
         
         return vsprintf($format, $marcData);
     }
