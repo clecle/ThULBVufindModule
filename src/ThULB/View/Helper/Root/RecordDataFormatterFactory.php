@@ -44,12 +44,6 @@ class RecordDataFormatterFactory extends OrignalFactory
         $spec->setTemplateLine(
             'Published in', 'getContainerTitle', 'data-containerTitle.phtml'
         );
-        $spec->setLine(
-            'New Title', 'getNewerTitles', null, ['recordLink' => 'title']
-        );
-        $spec->setLine(
-            'Previous Title', 'getPreviousTitles', null, ['recordLink' => 'title']
-        );
         $spec->setTemplateLine(
             'Main Authors', 'getDeduplicatedAuthors', 'data-authors.phtml',
             [
@@ -112,6 +106,9 @@ class RecordDataFormatterFactory extends OrignalFactory
         $spec->setTemplateLine('Online Access', true, 'data-onlineAccess.phtml');
         $spec->setTemplateLine(
             'Related Items', 'getAllRecordLinks', 'data-allRecordLinks.phtml'
+        );
+        $spec->setTemplateLine(
+            'Lineage Items', 'getLineageRecordLinks', 'data-allRecordLinks.phtml'
         );
         $spec->setTemplateLine('Tags', true, 'data-tags.phtml');
         $spec->setLine('Item Description', 'getGeneralNotes');

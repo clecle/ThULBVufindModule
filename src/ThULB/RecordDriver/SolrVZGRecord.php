@@ -391,6 +391,58 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         return $role ? [$role] : [];
     }
     
+    
+
+    /**
+     * Get all record links related to the current record, that are precedings or
+     * succeding titles respectively of the current record. Each link is returned
+     * as array.
+     * Format:
+     * array(
+     *        array(
+     *               'title' => label_for_title
+     *               'value' => link_name
+     *               'link'  => link_URI
+     *        ),
+     *        ...
+     * )
+     *
+     * @return null|array
+     */
+    public function getLineageRecordLinks()
+    {
+        // Load configurations:
+        $fieldsNames = ['780', '785'];
+        $useVisibilityIndicator
+            = isset($this->mainConfig->Record->marc_links_use_visibility_indicator)
+            ? $this->mainConfig->Record->marc_links_use_visibility_indicator : true;
+
+        $retVal = [];
+        foreach ($fieldsNames as $value) {
+            $value = trim($value);
+            $fields = $this->getMarcRecord()->getFields($value);
+            if (!empty($fields)) {
+                foreach ($fields as $field) {
+                    // Check to see if we should display at all
+                    if ($useVisibilityIndicator) {
+                        $visibilityIndicator = $field->getIndicator('1');
+                        if ($visibilityIndicator == '1') {
+                            continue;
+                        }
+                    }
+
+                    // Get data for field
+                    $tmp = $this->getFieldData($field);
+                    if (is_array($tmp)) {
+                        $retVal[] = $tmp;
+                    }
+                }
+            }
+        }
+        return empty($retVal) ? null : $retVal;
+    }
+    
+    
     /**
      * Get a formatted string from different MARC fields 
      * 
