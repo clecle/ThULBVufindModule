@@ -75,7 +75,7 @@ class MyResearchController extends OriginalController
             : [];
 
         // We always want to display a renewal form:
-        $renewForm = true;
+        $renewForm = false;
 
         // Get checked out item details:
         $result = $catalog->getMyProvidedItems($patron);
