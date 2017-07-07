@@ -239,6 +239,18 @@ class PAIA extends OriginalPAIA
     }
 
     /**
+     * Get the callnumber of this item
+     *
+     * @param array $doc Array of PAIA item.
+     *
+     * @return String
+     */
+    protected function getCallNumber($doc)
+    {
+        return isset($doc['label']) ? $this->removeDepIdFromCallNumber($doc['label']) : null;
+    }
+
+    /**
      * PAIA support method to retrieve needed ItemId in case PAIA-response does not
      * contain it
      *
