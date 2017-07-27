@@ -83,32 +83,36 @@ class Results extends OriginalResults
         return $ret;
     }
     
-    /**
-     * Returns the stored list of facets for the last search
-     *
-     * @param array $filter Array of field => on-screen description listing
-     * all of the desired facet fields; set to null to get all configured values.
-     *
-     * @return array        Facets data arrays
-     */
-    public function getFacetList($filter = null)
-    {
-        $facetList = parent::getFacetList($filter);
-        
-        $sort = function ($a, $b) {
-            if ($a['isApplied'] === $b['isApplied']) {
-                return 0;
-            } else if ($a['isApplied'] && !$b['isApplied']) {
-                return -1;
-            }
-            
-            return 1;
-        };
-        
-        foreach ($facetList as $facetLabel => $facetData) {
-            uasort($facetData['list'], $sort);
-        }
-        
-        return $facetList;
-    }
+//    /**
+//     * Returns the stored list of facets for the last search
+//     *
+//     * @param array $filter Array of field => on-screen description listing
+//     * all of the desired facet fields; set to null to get all configured values.
+//     *
+//     * @return array        Facets data arrays
+//     */
+//    public function getFacetList($filter = null)
+//    {
+//        $facetList = parent::getFacetList($filter);
+//        
+//        $sort = function ($a, $b) {
+//            if ($a['isApplied'] === $b['isApplied'] && $a['count'] === $b['count']) {
+//                return 0;
+//            } else if ($a['isApplied'] && !$b['isApplied'] 
+//                    || ($a['isApplied'] === $b['isApplied'] && $a['count'] > $b['count'])
+//            ) {
+//                return -1;
+//            }
+//            
+//            return 1;
+//        };
+//        
+//        foreach ($facetList as $facetLabel => $facetData) {
+//            uasort($facetData['list'], $sort);
+//            $facetData['counts'] = array_values($facetData['list']);
+//            $facetData['list'] = $facetData['counts'];
+//        }
+//        
+//        return $facetList;
+//    }
 }
