@@ -46,6 +46,26 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     protected $highlightedTitle;
 
     /**
+     * Returns true if the record supports real-time AJAX status lookups.
+     *
+     * @return bool
+     */
+    public function supportsAjaxStatus()
+    {
+        $noStatus = true;
+        $noStatusMedia = ['Article', 'eBook', 'eJournal', 'electronic Article', 'electronic Resource'];
+        
+        foreach ($this->getFormats() as $format) {
+            if (!in_array($format, $noStatusMedia)) {
+                $noStatus = false;
+                break;
+            }
+        }
+        
+        return !$noStatus;
+    }
+
+    /**
      * Get the short (pre-subtitle) title of the record.
      *
      * @return string
