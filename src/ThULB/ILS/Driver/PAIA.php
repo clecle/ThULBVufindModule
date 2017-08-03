@@ -262,6 +262,24 @@ class PAIA extends OriginalPAIA
     {
         return str_replace(self::DAIA_DOCUMENT_ID_PREFIX, '', $id);
     }
+
+    /**
+     * Returns an array with status information for provided item.
+     *
+     * @param array $item Array with DAIA item data
+     *
+     * @return array
+     */
+    protected function getItemStatus($item)
+    {
+        $status = parent::getItemStatus($item);
+        
+        if (!$status['availability'] && !isset($status['duedate'])) {
+            $status['use_unknown_message'] = true;
+        }
+        
+        return $status;
+    }
     
     protected function getStatusString($item)
     {

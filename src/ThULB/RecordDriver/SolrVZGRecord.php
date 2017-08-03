@@ -62,7 +62,10 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             }
         }
         
-        return !$noStatus;
+        $leader = $leader = $this->getMarcRecord()->getLeader();
+        
+        return ($leader[7] !== 's' && $leader[19] !== 'a' && !$noStatus);
+        
     }
 
     /**
