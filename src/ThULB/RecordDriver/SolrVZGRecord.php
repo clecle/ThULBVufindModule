@@ -62,9 +62,10 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             }
         }
         
-        $leader = $leader = $this->getMarcRecord()->getLeader();
+        $leader = $this->getMarcRecord()->getLeader();
+        $ordered = $this->getConditionalFieldArray('980', ['e'], true, '', ['2' => '31', 'e' => 'a']);
         
-        return ($leader[7] !== 's' && $leader[19] !== 'a' && !$noStatus);
+        return ($leader[7] !== 's' && $leader[19] !== 'a' && !$noStatus && empty($ordered));
         
     }
 
