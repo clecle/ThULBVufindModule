@@ -150,6 +150,30 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             is_array($this->fields['title_sub']) ?
             $this->fields['title_sub'][0] : $this->fields['title_sub'] : '';
     }
+    
+    /**
+     * Get the title of the item that contains this record (i.e. MARC 773s of a
+     * journal).
+     *
+     * @return string
+     */
+    public function getContainerTitle()
+    {
+        $containerTitle = $this->getFieldArray('773', ['t'], false);
+        return ($containerTitle) ? $containerTitle[0] : '';
+    }
+
+    /**
+     * Get a full, free-form reference to the context of the item that contains this
+     * record (i.e. volume, year, issue, pages).
+     *
+     * @return string
+     */
+    public function getContainerReference()
+    {
+        $containerRef = $this->getFieldArray('773', ['g'], false);
+        return ($containerRef) ? $containerRef[0] : '';
+    }
 
     /**
      * Returns one of three things: a full URL to a thumbnail preview of the record

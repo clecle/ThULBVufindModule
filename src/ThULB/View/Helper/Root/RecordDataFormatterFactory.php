@@ -42,9 +42,6 @@ class RecordDataFormatterFactory extends OrignalFactory
         $spec = new SpecBuilder();
         $spec->setLine('PartInfo', 'getPartInfo');
         $spec->setTemplateLine(
-            'Published in', 'getContainerTitle', 'data-containerTitle.phtml'
-        );
-        $spec->setTemplateLine(
             'Main Authors', 'getDeduplicatedAuthors', 'data-authors.phtml',
             [
                 'useCache' => true,
