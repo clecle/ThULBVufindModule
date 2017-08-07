@@ -1,7 +1,8 @@
 <?php
 
 namespace ThULB\ILS\Driver;
-use VuFind\ILS\Driver\PAIA as OriginalPAIA;
+use VuFind\ILS\Driver\PAIA as OriginalPAIA,
+    VuFind\I18n\Translator\TranslatorAwareInterface;
 
 /**
  * ThULB extension for the PAIA/DAIA driver
@@ -10,8 +11,34 @@ use VuFind\ILS\Driver\PAIA as OriginalPAIA;
  */
 class PAIA extends OriginalPAIA
 {
+    use \VuFind\I18n\Translator\TranslatorAwareTrait;
+    
     const DAIA_DOCUMENT_ID_PREFIX = 'http://uri.gbv.de/document/opac-de-27:ppn:';
 
+    /**
+     * Place Hold
+     *
+     * Attempts to place a hold or recall on a particular item and returns
+     * an array with result details
+     *
+     * Make a request on a specific record
+     *
+     * @param array $holdDetails An array of item and patron data
+     *
+     * @return mixed An array of data on the request including
+     * whether or not it was successful and a system message (if available)
+     */
+    public function placeHold($holdDetails)
+    {
+        $details = parent::placeHold($holdDetails);
+        
+        if ($details['success'] === false) {
+            $details['sysMessage'] = $this->translate($details['sysMessage']);
+        }
+        
+        return $details;
+    }
+    
     /**
      * Get Patron Holds
      *
