@@ -123,12 +123,11 @@ class HoldingHelper extends AbstractHelper
   {
     $holding_comments = "";
     if (!empty($itemRow['about'])) {
-      $holding_comments[] = $itemRow['about'];
+      $holding_comments = explode("\n", $itemRow['about']);
     }
     if (!empty($itemRow['chronology_about'])) {
       $holding_comments[] = $itemRow['chronology_about'];
     }
-
     return $holding_comments;
   }
 }
