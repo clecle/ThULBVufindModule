@@ -374,6 +374,9 @@ class PAIA extends OriginalPAIA
                 // about Field
                 $result_item['about']
                     = (isset($item['about']) ? $item['about'] : "");
+                // chronology > about Field
+                $result_item['chronology_about']
+                    = (isset($item['chronology']['about']) ? $item['chronology']['about'] : "");
                 // count items
                 $number++;
                 $result_item['number'] = $this->getItemNumber($item, $number);
