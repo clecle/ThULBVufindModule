@@ -970,7 +970,6 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
       * 
       * @return array
       * 
-      * @deprecated
       */
     public function getHoldingComments($epn_str)
     {

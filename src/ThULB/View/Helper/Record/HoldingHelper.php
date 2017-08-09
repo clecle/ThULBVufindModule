@@ -24,7 +24,7 @@ class HoldingHelper extends AbstractHelper
           $availabilityString .= '<span class="text-muted">' . $this->view->transEsc("status_unknown_message") . '</span>';
       } else {
         if ($itemRow['availability']) {
-          /* Begin AVALABLE Items (Holds) */
+          /* Begin AVAILABLE Items (Holds) */
           $availabilityString .= '<span class="text-success">' . $this->view->transEsc("Available") . '<link property="availability" href="http://schema.org/InStock" /></span>';
           if (isset($itemRow['link']) && $itemRow['link']) {
               $availabilityString .= '<a class="' . ($check ? 'checkRequest ' : '') . 'placehold" data-lightbox href="' . $this->view->recordLink()->getRequestUrl($itemRow['link']) . '"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;' . $this->view->transEsc($check ? "Check Hold" : "Place a Hold") . '</a>';
@@ -121,9 +121,14 @@ class HoldingHelper extends AbstractHelper
 
   public function getHoldingComments(&$itemRow)
   {
+    $holding_comments = "";
     if (!empty($itemRow['about'])) {
-      return $itemRow['about'];
+      $holding_comments[] = $itemRow['about'];
     }
-    return 0;
+    if (!empty($itemRow['chronology_about'])) {
+      $holding_comments[] = $itemRow['chronology_about'];
+    }
+
+    return $holding_comments;
   }
 }
