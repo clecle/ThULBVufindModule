@@ -416,6 +416,64 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         $roles = $this->getFirstFieldValue('100', ['4']);
         return $role ? [$role] : [];
     }
+
+    /**
+     * Get an array of all secondary authors (complementing getPrimaryAuthors()).
+     *
+     * @return array
+     */
+    public function getSecondaryAuthors()
+    {
+        $secondaryAuthors = [];
+        foreach (['700', '710', '711'] as $fieldnumber) {
+            $fields = $this->getMarcRecord()->getFields($fieldnumber);
+            foreach ($fields as $field) {
+                $fieldData = [];
+                foreach ($field->getSubfields() as $subfield) {
+                    if (in_array($subfield->getCode(), ['a', 'b', 'c', 'd', 'g'])) {
+                        $fieldData[$fieldnumber . $subfield->getCode()] = $subfield->getData();
+                    }
+                }
+                $fn = $fieldnumber;
+                $secondaryAuthors[] = $this->getFormattedMarcData(
+                        '(' . $fn . 'a (' . $fn . 'b (\((' . $fn . 'c, ' . $fn . 'd)\)) ' . $fn . 'g))', 
+                        true, 
+                        true, 
+                        $fieldData
+                    );
+            }
+        }
+        
+        
+        return $secondaryAuthors;
+    }
+
+    /**
+     * Get an array of all secondary authors roles (complementing
+     * getPrimaryAuthorsRoles()).
+     *
+     * @return array
+     */
+    public function getSecondaryAuthorsRoles()
+    {
+        $roles = [];
+        foreach (['700', '710', '711'] as $fieldnumber) {
+            $fields = $this->getMarcRecord()->getFields($fieldnumber);
+            foreach ($fields as $field) {
+                $fieldData = [];
+                foreach ($field->getSubfields() as $subfield) {
+                    if ($subfield->getCode() === '4') {
+                        $roles[] = $subfield->getData();
+                        continue 2;
+                    }
+                }
+                $roles[] = '';
+            }
+        }
+        
+        
+        return $roles;
+    }
     
     /**
      * Get the corporate authors (if any) for the record
@@ -424,7 +482,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     public function getCorporateAuthors()
     {
-        $author = $this->getFormattedMarcData('(110a (110b \((110c, 110d)\)( 110g)))');
+        $author = $this->getFormattedMarcData('(110a (110b (\((110c, 110d)\)) 110g))');
         return $author ? [$author] : [];
     }
     
@@ -516,7 +574,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      *                                      placeholder strings; Set to true, to
      *                                      remove them
      */
-    protected function getFormattedMarcData($format, $removeSeparators = true, $ignorePlaceholders = true)
+    protected function getFormattedMarcData($format, $removeSeparators = true, $ignorePlaceholders = true, $data = [])
     {   
         // keep all escaped parantheses by converting them to their html equivalent
         $format = str_replace('\(', '&#40;', $format);
@@ -529,7 +587,11 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         foreach ($marcFieldStrings[0] as $i => $marcFieldInfo) {
             $fieldNumber = substr($marcFieldInfo[0], 0, 3);
             $subfieldChar = substr($marcFieldInfo[0], 3);
-            $value = $this->getFirstFieldValue($fieldNumber, [$subfieldChar]);
+            if ($data && isset($data[$fieldNumber . $subfieldChar])) {
+                $value = $data[$fieldNumber . $subfieldChar];
+            } else {
+                $value = $this->getFirstFieldValue($fieldNumber, [$subfieldChar]);
+            }
             $value = ($ignorePlaceholders && !is_null($value) && in_array($value, self::$defaultPlaceholders)) ? null : $value;
             if (!is_null($value)) {
                 $marcData[$fieldNumber . $subfieldChar] = $value;
