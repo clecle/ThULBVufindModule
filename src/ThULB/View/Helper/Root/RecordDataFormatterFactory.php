@@ -72,6 +72,7 @@ class RecordDataFormatterFactory extends OrignalFactory
                 ],
             ]
         );
+        $spec->setLine('Conference', 'getMeetingNames');
         $spec->setLine(
             'Format', 'getFormats', 'RecordHelper',
             ['helperMethod' => 'getFormatList']

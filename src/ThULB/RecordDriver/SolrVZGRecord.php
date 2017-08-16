@@ -428,13 +428,11 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         $authorData = [];
         $relevantFields = [
                 '700' => ['a', 'b', 'c', 'd', 'g'],
-                '710' => ['a', 'b', 'c', 'd', 'g', 'n'],
-                '711' => ['a', 'b', 'c', 'd', 'g', 'n']
+                '710' => ['a', 'b', 'c', 'd', 'g', 'n']
             ];
         $formattingRules = [
                 '700' => '(700a (700b (\(, (700c, 700d)\)) 700g))',
-                '710' => '(710a (710b (\((710n, (710d, 710c))\)) 710g))',
-                '711' => '(711a (711b (\((711n, (711d, 711c))\)) 711g))'
+                '710' => '(710a (710b (\((710n, (710d, 710c))\)) 710g))'
             ];
         
         foreach ($relevantFields as $fieldnumber => $subfields) {
@@ -470,7 +468,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     public function getSecondaryAuthorsRoles()
     {
         $roles = [];
-        foreach (['700', '710', '711'] as $fieldnumber) {
+        foreach (['700', '710'] as $fieldnumber) {
             $fields = $this->getMarcRecord()->getFields($fieldnumber);
             foreach ($fields as $field) {
                 $fieldData = [];
@@ -486,6 +484,38 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         
         
         return $roles;
+    }
+    
+    /**
+     * Get an array of conferences or congresses, i.e. the names of meetings,
+     * with wich the publication was created 
+     * 
+     * @return array
+     */
+    public function getMeetingNames()
+    {
+        $meetingNames = [];
+        
+        $fields = $this->getMarcRecord()->getFields('711');
+        foreach ($fields as $field) {
+            $fieldData = [];
+            foreach ($field->getSubfields() as $subfield) {
+                if (in_array($subfield->getCode(), ['a', 'c', 'd', 'n'])) {
+                    $fieldData['711' . $subfield->getCode()] = 
+                            isset($fieldData['711' . $subfield->getCode()]) ? 
+                                ', ' . $subfield->getData() : $subfield->getData();
+                }
+            }
+
+            $meetingNames[] = $this->getFormattedMarcData(
+                    '(711a (711b (\((711n, (711d, 711c))\)))',
+                    true, 
+                    true, 
+                    $fieldData
+                );
+        }
+        
+        return $meetingNames;
     }
     
     /**
