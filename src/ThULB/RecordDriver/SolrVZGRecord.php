@@ -413,7 +413,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     public function getPrimaryAuthorsRoles()
     {
-        $roles = $this->getFirstFieldValue('100', ['4']);
+        $role = $this->getFirstFieldValue('100', ['4']);
         return $role ? [$role] : [];
     }
 

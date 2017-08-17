@@ -36,6 +36,13 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
     protected $template;
     
     /**
+     * Options for the spec builder of the record data formatter
+     *
+     * @var type 
+     */
+    protected $options = [];
+
+    /**
      * Optional name of the function of the record driver, that provides the
      * data for the view helper. This variable needs to be provided, if 
      * $template is not used.
@@ -95,6 +102,7 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
         
         foreach ($this->getRelevantData() as list($comment, $ppn, $longViewDe, $longViewEn, $shortView, $link)) {
             $record = $this->getRecordFromFindex($ppn);
+            $this->setTranslationLocale('de');
             $formatter = $this->getFormatter();
 
             $spec = $this->getFormatterSpecBuilder();
@@ -102,7 +110,8 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
                 $spec->setTemplateLine(
                         $key,
                         is_null($this->recordDriverFunction) ? true : $this->recordDriverFunction,
-                        $this->template
+                        $this->template,
+                        $this->options
                     );
             } else if (!is_null($this->recordDriverFunction)) {
                 $spec->setLine($this->metadataKey, $this->recordDriverFunction);

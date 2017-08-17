@@ -104,9 +104,9 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
             'proxyUrl' => new \VuFind\View\Helper\Root\ProxyUrl(),
             'record' => new \VuFind\View\Helper\Root\Record(),
             'recordLink' => new \ThULB\View\Helper\Root\RecordLink($this->getMockBuilder('VuFind\Record\Router')->disableOriginalConstructor()->getMock()),
-//            'searchTabs' => $this->getMockBuilder('VuFind\View\Helper\Root\SearchTabs')->disableOriginalConstructor()->getMock(),
-            'transEsc' => new \VuFind\View\Helper\Root\TransEsc(),
+            'searchTabs' => $this->getMockBuilder('VuFind\View\Helper\Root\SearchTabs')->disableOriginalConstructor()->getMock(),
             'translate' => new \VuFind\View\Helper\Root\Translate(),
+            'transEsc' => new \VuFind\View\Helper\Root\TransEsc(),
 //            'usertags' => new \VuFind\View\Helper\Root\UserTags(),
         ];
         $helpers['translate']->setTranslator($this->getTranslator());
@@ -134,7 +134,8 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
         
         $translator->setLocale($this->translationLocale)
                 ->addTranslationFile('ExtendedIni', null, 'default', $this->translationLocale)
-                ->addTranslationFile('ExtendedIni', 'Languages', 'Languages', $this->translationLocale);
+                ->addTranslationFile('ExtendedIni', 'Languages', 'Languages', $this->translationLocale)
+                ->addTranslationFile('ExtendedIni', 'CreatorRoles', 'CreatorRoles', $this->translationLocale);
         
         return $translator;
     }
