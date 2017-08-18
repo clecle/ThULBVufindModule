@@ -431,8 +431,8 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
                 '710' => ['a', 'b', 'c', 'd', 'g', 'n']
             ];
         $formattingRules = [
-                '700' => '(700a (700b (\(, (700c, 700d)\)) 700g))',
-                '710' => '(710a (710b (\((710n, (710d, 710c))\)) 710g))'
+                '700' => '(700a (700b (\((700c, 700d)\)) 700g))',
+                '710' => '(710a, (710b, (\((710n, (710d, 710c))\)) 710g))'
             ];
         
         foreach ($relevantFields as $fieldnumber => $subfields) {
@@ -443,16 +443,20 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
                     if (in_array($subfield->getCode(), $subfields)) {
                         $fieldData[$fieldnumber . $subfield->getCode()] = 
                                 isset($fieldData[$fieldnumber . $subfield->getCode()]) ? 
-                                    ', ' . $subfield->getData() : $subfield->getData();
+                                    $fieldData[$fieldnumber . $subfield->getCode()] . 
+                                        ', ' . $subfield->getData() :
+                                    $subfield->getData();
                     }
                 }
                 
-                $secondaryAuthors[] = $this->getFormattedMarcData(
-                        $formattingRules[$fieldnumber],
-                        true, 
-                        true, 
-                        $fieldData
-                    );
+                if ($fieldData) {
+                    $secondaryAuthors[] = $this->getFormattedMarcData(
+                            $formattingRules[$fieldnumber],
+                            true, 
+                            true, 
+                            $fieldData
+                        );
+                }
             }
         }
         
@@ -508,7 +512,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             }
 
             $meetingNames[] = $this->getFormattedMarcData(
-                    '(711a (711b (\((711n, (711d, 711c))\)))',
+                    '(711a (\((711n, (711d, 711c))\))',
                     true, 
                     true, 
                     $fieldData
@@ -525,7 +529,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     public function getCorporateAuthors()
     {
-        $author = $this->getFormattedMarcData('(110a (110b (\((110c, 110d)\)) 110g))');
+        $author = $this->getFormattedMarcData('(110a, (110b, (\((110c, 110d)\)) 110g))');
         return $author ? [$author] : [];
     }
     
@@ -633,7 +637,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             if ($data && isset($data[$fieldNumber . $subfieldChar])) {
                 $value = $data[$fieldNumber . $subfieldChar];
             } else {
-                $value = $this->getFirstFieldValue($fieldNumber, [$subfieldChar]);
+                $value = empty ($data) ? $this->getFirstFieldValue($fieldNumber, [$subfieldChar]) : null;
             }
             $value = ($ignorePlaceholders && !is_null($value) && in_array($value, self::$defaultPlaceholders)) ? null : $value;
             if (!is_null($value)) {
