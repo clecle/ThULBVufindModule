@@ -11,7 +11,8 @@ use VuFind\View\Helper\Root\Record as OriginalRecord;
 class Record extends OriginalRecord
 {
     /**
-     * Get HTML to render a title.
+     * Get HTML to render a title. Maximum length limitation is not applied
+     * anymore - it happens in javascript code.
      *
      * @param int $maxLength Maximum length of non-highlighted title.
      *
@@ -30,8 +31,7 @@ class Record extends OriginalRecord
         
         if (!empty($title)) {
             $escapeHtml = $this->getView()->plugin('escapeHtml');
-            $truncate = $this->getView()->plugin('truncate');
-            return $escapeHtml($truncate($title, $maxLength));
+            return $escapeHtml($title);
         }
         
         $transEsc = $this->getView()->plugin('transEsc');
