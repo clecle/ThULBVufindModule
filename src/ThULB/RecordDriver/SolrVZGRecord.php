@@ -402,7 +402,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     public function getPrimaryAuthors()
     {
-        $author = $this->getFormattedMarcData('(100a (100b (\((100c, 100d)\)) 100g))');
+        $author = $this->getFormattedMarcData('100a (100b (\((100c, 100d)\)))( 100g)');
         return $author ? [$author] : [];
     }
     
@@ -431,8 +431,8 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
                 '710' => ['a', 'b', 'c', 'd', 'g', 'n']
             ];
         $formattingRules = [
-                '700' => '(700a (700b (\((700c, 700d)\)) 700g))',
-                '710' => '(710a, (710b, (\((710n, (710d, 710c))\)) 710g))'
+                '700' => '700a (700b (\((700c, 700d)\)))( 700g)',
+                '710' => '710a, (710b, (\((710n, (710d, 710c))\)))( 710g)'
             ];
         
         foreach ($relevantFields as $fieldnumber => $subfields) {
@@ -529,7 +529,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     public function getCorporateAuthors()
     {
-        $author = $this->getFormattedMarcData('(110a, (110b, (\((110c, 110d)\)) 110g))');
+        $author = $this->getFormattedMarcData('110a, (110b, (\((110c, 110d)\)))( 110g)');
         return $author ? [$author] : [];
     }
     
@@ -677,7 +677,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         $format = str_replace('&#40;', '(', $format);
         $format = str_replace('&#41;', ')', $format);
         
-        return vsprintf($format, $marcData);
+        return trim(vsprintf($format, $marcData));
     }
 
     /**
