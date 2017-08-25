@@ -122,6 +122,8 @@ class PAIA extends OriginalPAIA
             $profile['statuscode'] = $patron['status'];
         }
         
+        $profile['user_id'] = $patron['id'];
+        
         return $profile;
     }
     
