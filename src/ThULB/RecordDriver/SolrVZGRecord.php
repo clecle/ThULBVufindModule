@@ -777,6 +777,46 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
     }
 
     /**
+     * Get general notes on the record.
+     *
+     * @return array
+     */
+    public function getGeneralNotes()
+    {
+        
+        $titleVariations = [];
+        
+        $fields = $this->getMarcRecord()->getFields('246');
+        foreach ($fields as $field) {
+            $visibilityIndicator = $field->getIndicator('1');
+            if ($visibilityIndicator != '1') {
+                continue;
+            }
+            $fieldData = [];
+            foreach ($field->getSubfields() as $subfield) {
+                if (in_array($subfield->getCode(), ['a', 'f', 'g', 'i'])) {
+                    $fieldData['246' . $subfield->getCode()] = 
+                            isset($fieldData['246' . $subfield->getCode()]) ? 
+                                ', ' . $subfield->getData() : $subfield->getData();
+                }
+            }
+
+            $titleVariations[] = $this->getFormattedMarcData(
+                    '246i(: 246a(, 246f(, 246g)))',
+                    true, 
+                    true, 
+                    $fieldData
+                );
+        }
+        
+        return array_merge(
+                $titleVariations,
+                $this->getFieldArray('500'),
+                $this->getFieldArray('501')
+            );
+    }
+
+    /**
      * Get an array of all series names containing the record.  Array entries may
      * be either the name string, or an associative array with 'name' and 'number'
      * keys.
