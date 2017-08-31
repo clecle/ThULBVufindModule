@@ -14,8 +14,6 @@ class PAIA extends OriginalPAIA
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
     
     const DAIA_DOCUMENT_ID_PREFIX = 'http://uri.gbv.de/document/opac-de-27:ppn:';
-    
-    protected $heldPickupLocations = array('Sonderlesesaal 1', 'Sonderlesesaal 2');
 
     /**
      * Place Hold
@@ -138,6 +136,11 @@ class PAIA extends OriginalPAIA
             if ($item['queue']) {
                 $result[$i]['queue'] = $item['queue'];
             }
+            
+            if (isset($item['storage']) && substr($item['storage'], 0, 14) === 'Sonderlesesaal') {
+                // storage (0..1) textual description of location of the document
+                $result[$i]['location'] = $item['storage'];
+            }
         }
         
         foreach ($result as $index => $doc) {
@@ -217,9 +220,7 @@ class PAIA extends OriginalPAIA
                     ? $this->convertDate($doc['duedate']) : '');
             }
             
-            if ($doc['status'] != 3 
-                || in_array($doc['storage'], $this->heldPickupLocations)
-            ) {
+            if ($doc['status'] != 3) {
                 // storage (0..1) textual description of location of the document
                 $result['location'] = (isset($doc['storage'])) ? $doc['storage'] : null;
             }
