@@ -106,8 +106,10 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             }
             
             $this->highlightedTitle = '';
-            foreach ($this->highlightDetails as $highlightDetail) {
-                $this->highlightedTitle .= implode('', $highlightDetail);
+            foreach ($this->highlightDetails as $highlightElement => $highlightDetail) {
+                if (strpos($highlightElement, 'title') !== false) {
+                    $this->highlightedTitle .= implode('', $highlightDetail);
+                }
             }
 
             // Apply highlighting to our customized title
@@ -1172,25 +1174,30 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
                 $replacements[$content] = $match;
             }
 
-            // sort array to have long keys first, because long search terms can
+            // sort array to have long keys at the end, because long search terms can
             // contain a shorter one and therefor should be replaced first
             $keySorter = function ($a, $b) {
-                return strlen($a) < strlen($b);
+                return strlen($a) - strlen($b);
             };
             uksort($replacements, $keySorter);
 
-            // use a formatted string with argument swapping, to prevent
-            // replacements inside former replacements
-            $formatString = $plainString;
-            $formatArgs = [];
-            $i = 0;
-            foreach ($replacements as $search => $replace) {
-                $i++;
-                $formatString = str_replace($search, '%' . $i . '$s', $formatString);
-                $formatArgs[] = $replace;
-            }
+            // use a recursive function to make replacements
+            $replace = function ($subject, $searches, $highlightings) use (&$replace) {
+                $searchString = array_pop($searches);
+                $highlightString = array_pop($highlightings);
+                $parts = explode($searchString, $subject);
+                if (is_array($parts) && count($parts) > 1) {
+                    foreach ($parts as $i => $part) {
+                        $parts[$i] = trim($replace(' ' . $part . ' ', $searches, $highlightings));
+                    }
+                
+                    return implode($highlightString, $parts);
+                }
+                
+                return $subject;
+            };
             
-            $modifiedString = vsprintf($formatString, $formatArgs);
+            $modifiedString = trim($replace(' ' . $plainString . ' ', array_keys($replacements), array_values($replacements)));
         }
 
         return $modifiedString;
