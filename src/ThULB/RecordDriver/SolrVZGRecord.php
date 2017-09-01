@@ -1184,9 +1184,12 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             // use a recursive function to make replacements
             $replace = function ($subject, $searches, $highlightings) use (&$replace) {
                 $searchString = array_pop($searches);
+                if (!$searchString) {
+                    return $subject;
+                }
                 $highlightString = array_pop($highlightings);
                 $parts = explode($searchString, $subject);
-                if (is_array($parts) && count($parts) > 1) {
+                if (is_array($parts) && $parts) {
                     foreach ($parts as $i => $part) {
                         $parts[$i] = trim($replace(' ' . $part . ' ', $searches, $highlightings));
                     }
