@@ -706,7 +706,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
 
         $linkTypeSetting = isset($this->mainConfig->Record->marc_links_link_types)
             ? $this->mainConfig->Record->marc_links_link_types
-            : 'id,isbn,issn,zdb,dnb,title';
+            : 'id,isbn,issn,dnb,zdb,title';
         $linkTypes = explode(',', $linkTypeSetting);
         $linkFields = $field->getSubfields('w');
 
@@ -740,19 +740,19 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
                     ];
                 }
                 break;
-            case 'zdb':
-                foreach ($linkFields as $current) {
-                    $bibLink = $this->getIdFromLinkingField($current, self::ZDB_LINK_ID_PREFIX);
-                    if ($bibLink) {
-                        $link = ['type' => 'zdb', 'value' => $bibLink];
-                    }
-                }
-                break;
             case 'dnb':
                 foreach ($linkFields as $current) {
                     $bibLink = $this->getIdFromLinkingField($current, self::DNB_LINK_ID_PREFIX);
                     if ($bibLink) {
                         $link = ['type' => 'dnb', 'value' => $bibLink];
+                    }
+                }
+                break;
+            case 'zdb':
+                foreach ($linkFields as $current) {
+                    $bibLink = $this->getIdFromLinkingField($current, self::ZDB_LINK_ID_PREFIX);
+                    if ($bibLink) {
+                        $link = ['type' => 'zdb', 'value' => $bibLink];
                     }
                 }
                 break;
