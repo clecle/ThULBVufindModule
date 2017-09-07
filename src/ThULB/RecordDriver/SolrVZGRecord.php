@@ -107,9 +107,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             
             $this->highlightedTitle = '';
             foreach ($this->highlightDetails as $highlightElement => $highlightDetail) {
-                if (strpos($highlightElement, 'title') !== false) {
-                    $this->highlightedTitle .= implode('', $highlightDetail);
-                }
+                $this->highlightedTitle .= implode('', $this->groupHighlighting($highlightDetail));
             }
 
             // Apply highlighting to our customized title
@@ -1202,7 +1200,12 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             
             $modifiedString = trim($replace(' ' . $plainString . ' ', array_keys($replacements), array_values($replacements)));
         }
-
+        
         return $modifiedString;
+    }
+    
+    protected function groupHighlighting($highlightString)
+    {
+        return preg_replace('/\{\{\{\{END_HILITE\}\}\}\}\s?\{\{\{\{START_HILITE\}\}\}\}/', ' ', $highlightString);
     }
 }
