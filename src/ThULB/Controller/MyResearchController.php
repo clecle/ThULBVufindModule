@@ -190,6 +190,32 @@ class MyResearchController extends OriginalController
         $view->recordList = $recordList;
         return $view;
     }
+
+    /**
+     * Provide a link to the password change site of the ILS.
+     *
+     * @return view
+     */
+    public function changePasswordLinkAction()
+    {
+        // Stop now if the user does not have valid catalog credentials available:
+        if (!is_array($patron = $this->catalogLogin())) {
+            return $patron;
+        }
+        
+        if (!$this->getAuthManager()->isLoggedIn()) {
+            return $this->forceLogin();
+        }
+        
+        $view = $this->createViewModel($this->params()->fromPost());
+
+        // User must be logged in at this point, so we can assume this is non-false:
+        $user = $this->getUser();
+        $view->userId = $user->username;
+        
+        $view->setTemplate('myresearch/ilsaccountlink');
+        return $view;
+    }
     
     /**
      * Get a record driver object corresponding to an array returned by an ILS
