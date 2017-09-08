@@ -594,6 +594,49 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         }
         return empty($retVal) ? null : $retVal;
     }
+
+    /**
+     * Get an array of all ISBNs associated with the record (may be empty).
+     *
+     * @return array
+     */
+    public function getISBNs()
+    {
+        $isbns = [];
+        $fields = $this->getMarcRecord()->getFields('020');
+        
+        foreach ($fields as $field) {
+            $fieldData = [];
+            foreach ($field->getSubfields() as $subfield) {
+                if (in_array($subfield->getCode(), ['9', 'c'])) {
+                    $fieldData['020' . $subfield->getCode()] = 
+                            isset($fieldData['020' . $subfield->getCode()]) ? 
+                                ', ' . $subfield->getData() : $subfield->getData();
+                }
+            }
+
+            $isbns[] = $this->getFormattedMarcData(
+                    '0209 : 020c',
+                    true, 
+                    true, 
+                    $fieldData
+                );
+        }
+        
+        return $isbns;
+    }
+    
+    
+
+    /**
+     * Get an array of all invalid ISBNs associated with the record (may be empty).
+     *
+     * @return array
+     */
+    public function getInvalidISBNs()
+    {
+        return $this->getFieldArray('020', ['z'], false);
+    }
     
     
     /**
