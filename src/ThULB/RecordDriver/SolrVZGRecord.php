@@ -802,7 +802,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             }
 
             $titleVariations[] = $this->getFormattedMarcData(
-                    '246i(: 246a(, 246f(, 246g)))',
+                    '246i: (246a, (246f, 246g))',
                     true, 
                     true, 
                     $fieldData
