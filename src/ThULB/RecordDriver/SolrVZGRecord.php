@@ -1084,15 +1084,24 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             $txt = "fulltext";
           }
 
-          /* Now, we are ready to extract extra-information */
+          /* Now, we are ready to extract extra-information
+           * @details for each link is common catalogisation till RDA-introduction
+           */
           $details = $this->getConditionalFieldArray('980', ['g', 'k'], false, '', ['2' => '31', '1' => $id]);
-          $corporates = $this->getConditionalFieldArray('982', ['a'], false, '', ['2' => '31', '1' => $id]);
           
+          if ( empty($details) ) {
+            /* new catalogisation rules with RDA: One Link and single Details for each part */
+            $details = $this->getConditionalFieldArray('980', ['g', 'k'], false, '', ['2' => '31']);
+          }
           if ( !empty($details) ) {
             foreach ($details as $detail) {
-               $more .= $detail."<br>";
+              $more .= $detail."<br>";
             }
+          } else {
+            $more = "";
           }
+
+          $corporates = $this->getConditionalFieldArray('982', ['a'], false, '', ['2' => '31', '1' => $id]);
           if ( !empty($corporates) ) {
             foreach ($corporates as $corporate) {
               $more .= $corporate."<br>";
