@@ -1,7 +1,7 @@
 <?php
 namespace ThULB\Module\Configuration;
 
-return [
+$config = [
     'controllers' => [
         'invokables'    => [
             'ajax' => 'ThULB\Controller\AjaxController',
@@ -103,3 +103,8 @@ return [
         ],
     ],
 ];
+
+$routeGenerator = new \VuFind\Route\RouteGenerator();
+$routeGenerator->addStaticRoute($config, 'MyResearch/ChangePasswordLink');
+
+return $config;

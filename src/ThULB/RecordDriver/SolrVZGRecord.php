@@ -107,9 +107,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             
             $this->highlightedTitle = '';
             foreach ($this->highlightDetails as $highlightElement => $highlightDetail) {
-                if (strpos($highlightElement, 'title') !== false) {
-                    $this->highlightedTitle .= implode('', $highlightDetail);
-                }
+                $this->highlightedTitle .= implode('', $this->groupHighlighting($highlightDetail));
             }
 
             // Apply highlighting to our customized title
@@ -596,6 +594,49 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         }
         return empty($retVal) ? null : $retVal;
     }
+
+    /**
+     * Get an array of all ISBNs associated with the record (may be empty).
+     *
+     * @return array
+     */
+    public function getISBNs()
+    {
+        $isbns = [];
+        $fields = $this->getMarcRecord()->getFields('020');
+        
+        foreach ($fields as $field) {
+            $fieldData = [];
+            foreach ($field->getSubfields() as $subfield) {
+                if (in_array($subfield->getCode(), ['9', 'c'])) {
+                    $fieldData['020' . $subfield->getCode()] = 
+                            isset($fieldData['020' . $subfield->getCode()]) ? 
+                                ', ' . $subfield->getData() : $subfield->getData();
+                }
+            }
+
+            $isbns[] = $this->getFormattedMarcData(
+                    '0209 : 020c',
+                    true, 
+                    true, 
+                    $fieldData
+                );
+        }
+        
+        return $isbns;
+    }
+    
+    
+
+    /**
+     * Get an array of all invalid ISBNs associated with the record (may be empty).
+     *
+     * @return array
+     */
+    public function getInvalidISBNs()
+    {
+        return $this->getFieldArray('020', ['z'], false);
+    }
     
     
     /**
@@ -804,7 +845,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             }
 
             $titleVariations[] = $this->getFormattedMarcData(
-                    '246i(: 246a(, 246f(, 246g)))',
+                    '246i: (246a, (246f, 246g))',
                     true, 
                     true, 
                     $fieldData
@@ -1211,7 +1252,12 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             
             $modifiedString = trim($replace(' ' . $plainString . ' ', array_keys($replacements), array_values($replacements)));
         }
-
+        
         return $modifiedString;
+    }
+    
+    protected function groupHighlighting($highlightString)
+    {
+        return preg_replace('/\{\{\{\{END_HILITE\}\}\}\}\s?\{\{\{\{START_HILITE\}\}\}\}/', ' ', $highlightString);
     }
 }
