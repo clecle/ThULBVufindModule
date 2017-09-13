@@ -212,6 +212,16 @@ class MyResearchController extends OriginalController
         $view->setTemplate('myresearch/ilsaccountlink');
         return $view;
     }
+
+    /**
+     * Catalog Login Action
+     *
+     * @return mixed
+     */
+    public function catalogloginAction()
+    {
+        return $this->forwardTo('MyResearch', 'Login');
+    }
     
     /**
      * Get a record driver object corresponding to an array returned by an ILS
