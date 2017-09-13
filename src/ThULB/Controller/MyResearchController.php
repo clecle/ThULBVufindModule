@@ -208,10 +208,6 @@ class MyResearchController extends OriginalController
         }
         
         $view = $this->createViewModel($this->params()->fromPost());
-
-        // User must be logged in at this point, so we can assume this is non-false:
-        $user = $this->getUser();
-        $view->userId = $user->username;
         
         $view->setTemplate('myresearch/ilsaccountlink');
         return $view;
