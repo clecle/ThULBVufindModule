@@ -511,4 +511,34 @@ class PAIA extends OriginalPAIA
         
         return $callNumber;
     }
+
+    /**
+     * Helper function for PAIA to uniformely parse JSON. Extended and fixed
+     * version.
+     *
+     * @param string $file JSON data
+     *
+     * @return mixed
+     * @throws ILSException
+     */
+    protected function paiaParseJsonAsArray($file)
+    {
+        $responseArray = json_decode($file, true);
+
+        if (isset($responseArray['error'])) {
+            $message = $responseArray['error'];
+            if (isset($responseArray['error_description'])) {
+                $message .= ' (' . $responseArray['error_description'] . ')';
+            }
+            if (isset($responseArray['error_uri'])) {
+                $message .= '; see ' . $responseArray['error_uri'] . ' for more information';
+            }
+            
+            $code = (isset($responseArray['code'])) ? $responseArray['code'] : 0;
+            
+            throw new ILSException($message, $code);
+        }
+
+        return $responseArray;
+    }
 }
