@@ -107,7 +107,9 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             
             $this->highlightedTitle = '';
             foreach ($this->highlightDetails as $highlightElement => $highlightDetail) {
-                $this->highlightedTitle .= implode('', $this->groupHighlighting($highlightDetail));
+                if (strpos($highlightElement, 'title') !== false) {
+                    $this->highlightedTitle .= implode('', $this->groupHighlighting($highlightDetail));
+                }
             }
 
             // Apply highlighting to our customized title
