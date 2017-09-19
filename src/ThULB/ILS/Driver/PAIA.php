@@ -2,7 +2,8 @@
 
 namespace ThULB\ILS\Driver;
 use VuFind\ILS\Driver\PAIA as OriginalPAIA,
-    VuFind\I18n\Translator\TranslatorAwareInterface;
+    VuFind\I18n\Translator\TranslatorAwareInterface,
+    VuFind\Exception\ILS as ILSException;
 
 /**
  * ThULB extension for the PAIA/DAIA driver
