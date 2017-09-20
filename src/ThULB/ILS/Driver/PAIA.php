@@ -270,7 +270,7 @@ class PAIA extends OriginalPAIA
             return ($dateA < $dateB) ? -1 : 1;
         };
         
-        uasort($result, $sort);
+        uasort($results, $sort);
 
         return $results;
     }

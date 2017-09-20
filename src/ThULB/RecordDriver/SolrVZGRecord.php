@@ -1109,7 +1109,10 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
          */
         foreach ( $links as $link ) {
           $more = "";
-          list($id, $txt, $url) = explode("|", $link);
+          $linkElements = explode("|", $link);
+          $id = (isset($linkElements[0]) ? $linkElements[0] : '');
+          $txt = (isset($linkElements[1]) ? $linkElements[1] : '');
+          $url = (isset($linkElements[2]) ? $linkElements[2] : '');
        
           /* do we have a picture? f.e. ELS-gif */
           if ( substr($txt, -3) == "gif" ) {
@@ -1158,7 +1161,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
            * 981 |2 31  |1 00  |w http://kataloge.thulb.uni-jena.de/img_psi/2.0/logos/eLS.gif 
            * 981 |2 31  |1 00  |y Volltext  |w http://mybib.thulb.uni-jena.de/els/browser/open/557127483  
            */
-          $tmp = $retVal[$id];
+          $tmp = (isset($retVal[$id])) ? $retVal[$id] : '';
           $retVal[$id] = $txt . "|" . $url . "|" . $more . "|" . $tmp;
         }
       } else {
