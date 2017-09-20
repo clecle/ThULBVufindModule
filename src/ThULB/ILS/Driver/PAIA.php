@@ -3,7 +3,8 @@
 namespace ThULB\ILS\Driver;
 use VuFind\ILS\Driver\PAIA as OriginalPAIA,
     VuFind\I18n\Translator\TranslatorAwareInterface,
-    VuFind\Exception\ILS as ILSException;
+    VuFind\Exception\ILS as ILSException,
+    VuFind\Exception\Auth as AuthException;
 
 /**
  * ThULB extension for the PAIA/DAIA driver
@@ -15,6 +16,7 @@ class PAIA extends OriginalPAIA
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
     
     const DAIA_DOCUMENT_ID_PREFIX = 'http://uri.gbv.de/document/opac-de-27:ppn:';
+    const PAIA_INVALID_CREDENTIALS_MSG = '0:access_denied (invalid patron or password)';
 
     /**
      * Place Hold
@@ -445,6 +447,60 @@ class PAIA extends OriginalPAIA
         }
         
         return $holding;
+    }
+    
+    /**
+     * Patron Login
+     *
+     * This is responsible for authenticating a patron against the catalog.
+     *
+     * @param string $username The patron's username
+     * @param string $password The patron's login password
+     *
+     * @return mixed          Associative array of patron info on successful login,
+     * null on unsuccessful login.
+     *
+     * @throws ILSException
+     */
+    public function patronLogin($username, $password)
+    {
+        if ($username == '' || $password == '') {
+            throw new AuthException('authentication_error_invalid');
+        }
+
+        $session = $this->getSession();
+
+        // if we already have a session with access_token and patron id, try to get
+        // patron info with session data
+        if (isset($session->expires) && $session->expires > time()) {
+            try {
+                return $this->enrichUserDetails(
+                    $this->paiaGetUserDetails($session->patron),
+                    $password
+                );
+            } catch (ILSException $e) {
+                $this->debug('Session expired, login again', ['info' => 'info']);
+            }
+        }
+        try {
+            if ($this->paiaLogin($username, $password)) {
+                return $this->enrichUserDetails(
+                    $this->paiaGetUserDetails($session->patron),
+                    $password
+                );
+            }
+        } catch (ILSException $e) {
+            if ($e->getMessage() === self::PAIA_INVALID_CREDENTIALS_MSG) {
+                throw new AuthException('authentication_error_invalid');
+            }
+            
+            throw new ILSException($e->getMessage());
+        }
+    }
+    
+    public function getOfflineMode()
+    {
+        return false;
     }
 
     /**
