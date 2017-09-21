@@ -918,7 +918,9 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
                     $name = $this->getSubfieldArray($currentField, $subfields);
                     if (!isset($name[0])) {
                         $volume = $this->getSubfieldArray($currentField, ['v']);
-                        $name = $this->getConditionalFieldArray('490', ['a'], true, ' ', ['v' => $volume[0]]);
+                        if ($volume) {
+                            $name = $this->getConditionalFieldArray('490', ['a'], true, ' ', ['v' => $volume[0]]);
+                        }
                     }
                     
                     if (isset($name[0])) {
