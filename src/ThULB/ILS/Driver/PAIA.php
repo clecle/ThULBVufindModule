@@ -465,7 +465,7 @@ class PAIA extends OriginalPAIA
     public function patronLogin($username, $password)
     {
         if ($username == '' || $password == '') {
-            throw new AuthException('authentication_error_invalid');
+            throw new ILSException('Invalid Login, Please try again.');
         }
 
         $session = $this->getSession();
@@ -490,7 +490,9 @@ class PAIA extends OriginalPAIA
                 );
             }
         } catch (ILSException $e) {
-            if ($e->getMessage() === self::PAIA_INVALID_CREDENTIALS_MSG) {
+            if ($e->getMessage() === self::PAIA_INVALID_CREDENTIALS_MSG 
+                    && $password !== \ThULB\Db\Row\OAuthUser::DUMMY_PASSWORD
+            ) {
                 throw new AuthException('authentication_error_invalid');
             }
             
