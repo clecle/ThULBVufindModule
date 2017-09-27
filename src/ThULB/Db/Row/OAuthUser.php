@@ -22,6 +22,8 @@ class OAuthUser extends OriginalUser
      */
     public function saveCredentials($username, $password)
     {
+        $this->firstname = substr($this->firstname, 0, 50);
+        $this->lastname = substr($this->lastname, 0, 50);
         return parent::saveCredentials($username, self::DUMMY_PASSWORD);
     }
 }
