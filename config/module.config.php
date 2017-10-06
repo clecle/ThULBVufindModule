@@ -12,9 +12,9 @@ $config = [
     ],
     'vufind' => [
         'plugin_managers' => [
-            'db_table' => [
+            'db_row' => [
                 'factories' => [
-                    'user' => 'ThULB\Db\Table\Factory::getUser'
+                    'user' => 'ThULB\Db\Row\Factory::getUser'
                 ],
             ],
             'hierarchy_treedataformatter' => [
