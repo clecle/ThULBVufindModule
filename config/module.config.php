@@ -2,6 +2,14 @@
 namespace ThULB\Module\Configuration;
 
 $config = [
+    'controllers' => [
+        'factories'    => [
+            'ajax' => 'ThULB\Controller\Factory::getAjaxController',
+            'my-research' => 'ThULB\Controller\Factory::getMyResearchController',
+            'summon' => 'ThULB\Controller\Factory::getSummonController',
+            'summonrecord' => 'ThULB\Controller\Factory::getSummonrecordController',
+        ]
+    ],
     'vufind' => [
         'plugin_managers' => [
             'db_row' => [
