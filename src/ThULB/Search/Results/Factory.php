@@ -21,10 +21,16 @@ class Factory {
     {
         $options = $sm->getServiceLocator()
             ->get('VuFind\SearchParamsPluginManager')->get('Summon');
+        $searchService = $sm->getServiceLocator()
+            ->get('VuFind\Search');
+        $recordLoader = $sm->getServiceLocator()
+            ->get('VuFind\RecordLoader');
         
         // Clone the options instance in case caller modifies it:
         return new SummonResults(
-                clone($options)
+                clone($options),
+                $searchService,
+                $recordLoader
             );
     }
 }

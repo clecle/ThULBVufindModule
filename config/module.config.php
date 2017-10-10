@@ -39,11 +39,11 @@ $config = [
                     'staffviewcombined' => 'ThULB\RecordTab\StaffViewCombined'
                 ]
             ],
-//            'search_results' => [
-//                'factories' => [
-//                    'summon' => 'ThULB\Search\Results\Factory::getSummon'
-//                ]
-//            ]
+            'search_results' => [
+                'factories' => [
+                    'summon' => 'ThULB\Search\Results\Factory::getSummon'
+                ]
+            ]
         ],
         'recorddriver_tabs' => [
             'VuFind\RecordDriver\SolrDefault' => [
