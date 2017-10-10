@@ -2,14 +2,6 @@
 namespace ThULB\Module\Configuration;
 
 $config = [
-    'controllers' => [
-        'invokables'    => [
-            'ajax' => 'ThULB\Controller\AjaxController',
-            'my-research' => 'ThULB\Controller\MyResearchController',
-            'summon' => 'ThULB\Controller\SummonController',
-            'summonrecord' => 'ThULB\Controller\SummonrecordController',
-        ]
-    ],
     'vufind' => [
         'plugin_managers' => [
             'db_row' => [
@@ -47,11 +39,11 @@ $config = [
                     'staffviewcombined' => 'ThULB\RecordTab\StaffViewCombined'
                 ]
             ],
-            'search_results' => [
-                'factories' => [
-                    'summon' => 'ThULB\Search\Results\Factory::getSummon'
-                ]
-            ]
+//            'search_results' => [
+//                'factories' => [
+//                    'summon' => 'ThULB\Search\Results\Factory::getSummon'
+//                ]
+//            ]
         ],
         'recorddriver_tabs' => [
             'VuFind\RecordDriver\SolrDefault' => [
