@@ -97,18 +97,21 @@ abstract class AbstractViewHelperTest extends \VuFindTest\Unit\ViewHelperTestCas
     protected function getViewHelpers()
     {   
         $context = new \VuFind\View\Helper\Root\Context();
-        $helpers = [
+        
+        
+        $helpers =  [
 //            'auth' => new \VuFind\View\Helper\Root\Auth($this->getMockBuilder('VuFind\Auth\Manager')->disableOriginalConstructor()->getMock()),
             'context' => $context,
-            'openUrl' => new \VuFind\View\Helper\Root\OpenUrl($context, []),
+            'openUrl' => new \VuFind\View\Helper\Root\OpenUrl($context, [], $this->getMockBuilder('VuFind\Resolver\Driver\PluginManager')->disableOriginalConstructor()->getMock()),
             'proxyUrl' => new \VuFind\View\Helper\Root\ProxyUrl(),
             'record' => new \VuFind\View\Helper\Root\Record(),
             'recordLink' => new \ThULB\View\Helper\Root\RecordLink($this->getMockBuilder('VuFind\Record\Router')->disableOriginalConstructor()->getMock()),
             'searchTabs' => $this->getMockBuilder('VuFind\View\Helper\Root\SearchTabs')->disableOriginalConstructor()->getMock(),
-            'translate' => new \VuFind\View\Helper\Root\Translate(),
             'transEsc' => new \VuFind\View\Helper\Root\TransEsc(),
+            'translate' => new \VuFind\View\Helper\Root\Translate(),
 //            'usertags' => new \VuFind\View\Helper\Root\UserTags(),
         ];
+        
         $helpers['translate']->setTranslator($this->getTranslator());
         
         return $helpers;

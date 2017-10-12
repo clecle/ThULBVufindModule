@@ -16,6 +16,11 @@ class CorpAuthorMetadataTest extends AbstractRecordDataFormatterTest
     protected $recordDriverFunction = 'getDeduplicatedAuthors';
     protected $template = 'data-authors.phtml';
     protected $options = [
-                    'context' => ['type' => 'corporate', 'schemaLabel' => 'creator']
+                    'context' => [
+                        'type' => 'corporate',
+                        'schemaLabel' => 'creator',
+                        'requiredDataFields' => [
+                            ['name' => 'role', 'prefix' => 'CreatorRoles::']
+                        ]]
                 ];
 }

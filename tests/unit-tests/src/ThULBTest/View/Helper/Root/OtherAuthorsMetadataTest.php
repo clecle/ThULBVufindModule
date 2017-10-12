@@ -16,6 +16,11 @@ class OtherAuthorsMetadataTest extends AbstractRecordDataFormatterTest
     protected $recordDriverFunction = 'getDeduplicatedAuthors';
     protected $template = 'data-authors.phtml';
     protected $options = [
-                    'context' => ['type' => 'secondary', 'schemaLabel' => 'contributor']
+                    'context' => [
+                        'type' => 'secondary',
+                        'schemaLabel' => 'contributor',
+                        'requiredDataFields' => [
+                            ['name' => 'role', 'prefix' => 'CreatorRoles::']
+                        ]]
                 ];
 }

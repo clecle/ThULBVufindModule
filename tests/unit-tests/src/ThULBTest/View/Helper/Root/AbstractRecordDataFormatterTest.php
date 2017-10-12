@@ -125,7 +125,7 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
             $comment = '=== Sheet: ' . $this->sheetName . ', PPN: ' . $ppn . ', DE ===';
             $this->assertEquals(
                     $this->normalizeUtf8String($longViewDe),
-                    $this->convertHtmlToString($data[$key]),
+                    $this->convertHtmlToString($data[$key]['value']),
                     $comment
                 );
             
@@ -137,7 +137,7 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
                 $comment = '=== Sheet: ' . $this->sheetName . ', PPN: ' . $ppn . ', EN ===';
                 $this->assertEquals(
                         $this->normalizeUtf8String($longViewEn),
-                        $this->convertHtmlToString($data[$key]),
+                        $this->convertHtmlToString($data[$key]['value']),
                         $comment
                     );
             }
@@ -191,7 +191,8 @@ abstract class AbstractRecordDataFormatterTest extends AbstractViewHelperTest
      */
     protected function normalizeUtf8String($utf8String)
     {
-        return iconv('UTF-8', 'ASCII//TRANSLIT', $utf8String);
+        $output = iconv('UTF-8', 'ASCII//TRANSLIT', $utf8String);
+        return preg_replace('/\s{2,}/', ' ', $output);
     }
 
 
