@@ -21,6 +21,24 @@ class Factory
     {
         return new AjaxController($sm->getServiceLocator());
     }
+
+    /**
+     * Construct the CartController.
+     *
+     * @param ServiceManager $sm Service manager.
+     *
+     * @return CartController
+     */
+    public static function getCartController(ServiceManager $sm)
+    {
+        return new CartController(
+            $sm->getServiceLocator(),
+            new \Zend\Session\Container(
+                'cart_followup',
+                $sm->getServiceLocator()->get('VuFind\SessionManager')
+            )
+        );
+    }
     
     /**
      * Construct the MyResearchController.

@@ -5,6 +5,7 @@ $config = [
     'controllers' => [
         'factories'    => [
             'ajax' => 'ThULB\Controller\Factory::getAjaxController',
+            'cart' => 'ThULB\Controller\Factory::getCartController',
             'my-research' => 'ThULB\Controller\Factory::getMyResearchController',
             'summon' => 'ThULB\Controller\Factory::getSummonController',
             'summonrecord' => 'ThULB\Controller\Factory::getSummonrecordController',
