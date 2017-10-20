@@ -761,7 +761,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             switch (trim($linkType)){
             case 'id':
                 foreach ($linkFields as $current) {
-                    $bibLink = $this->getIdFromLinkingField($current, self::PPN_LINK_ID_PREFIX);
+                    $bibLink = trim($this->getIdFromLinkingField($current, self::PPN_LINK_ID_PREFIX), '*');
                     if ($bibLink) {
                         $link = ['type' => 'bib', 'value' => $bibLink];
                     }
