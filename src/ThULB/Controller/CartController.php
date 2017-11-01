@@ -15,4 +15,10 @@ class CartController extends OriginalCartController
         $this->layout()->setVariable('showBreadcrumbs', false);        
         return parent::homeAction();
     }
+    
+    public function processorAction()
+    {
+        $this->layout()->setVariable('showBreadcrumbs', false);        
+        return parent::processorAction();
+    }
 }
