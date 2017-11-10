@@ -33,6 +33,14 @@ $config = [
                     'paia' => 'ThULB\ILS\Driver\Factory::getPAIA'
                 ]
             ],
+            'recommend' => [
+                'factories' => [
+                    'summoncombined' => 'ThULB\Recommend\Factory::getSummonCombined',                    
+                ],
+                'invokables' => [
+                    'summoncombineddeferred' => 'ThULB\Recommend\SummonCombinedDeferred',
+                ]
+            ],
             'recorddriver' => [
                 'factories' => [
                     'solrmarc' => 'ThULB\RecordDriver\Factory::getSolrMarc',
