@@ -604,4 +604,33 @@ class PAIA extends OriginalPAIA
 
         return $responseArray;
     }
+
+    /**
+     * Check if hold or recall available
+     *
+     * This is responsible for determining if an item is requestable
+     *
+     * @param string $id     The Bib ID
+     * @param array  $data   An Array of item data
+     * @param patron $patron An array of patron data
+     *
+     * @return bool True if request is valid, false if not
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function checkRequestIsValid($id, $data, $patron)
+    {
+        if (isset($patron['status']) && $patron['status']  == 2) {
+            return [
+                    'valid'     => false,
+                    'status'    => 'blocked_for_expired_account'
+                ];
+        } else if (isset($patron['status']) && $patron['status']  == 0
+            && isset($patron['expires']) && $patron['expires'] > date('Y-m-d')
+            && in_array('write_items', $this->getScope())
+        ) {
+            return true;
+        }
+        return false;
+    }
 }
