@@ -626,7 +626,7 @@ class PAIA extends OriginalPAIA
                     'status'    => 'blocked_for_expired_account'
                 ];
         } else if (isset($patron['status']) && $patron['status']  == 0
-            && isset($patron['expires']) && $patron['expires'] > date('Y-m-d')
+            && isset($patron['expires']) && $patron['expires'] >= date('Y-m-d')
             && in_array('write_items', $this->getScope())
         ) {
             return true;
