@@ -166,7 +166,7 @@ class PAIA extends OriginalPAIA
             return ($dateA < $dateB) ? -1 : 1;
         };
         
-        uasort($result, $sort);
+        usort($result, $sort);
         
         return $result;
     }
@@ -276,7 +276,7 @@ class PAIA extends OriginalPAIA
             return ($dateA < $dateB) ? -1 : 1;
         };
         
-        uasort($results, $sort);
+        usort($results, $sort);
 
         return $results;
     }
