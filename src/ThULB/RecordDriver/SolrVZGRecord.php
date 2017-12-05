@@ -173,8 +173,14 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      */
     public function getContainerReference()
     {
-        $containerRef = $this->getFieldArray('773', ['g'], false);
-        return ($containerRef) ? $containerRef[0] : '';
+        $containerRef = $this->getFieldArray('773', ['g'], false); 
+       return ($containerRef) ? $containerRef[0] : '';
+    }
+    
+    public function getContainerLink()
+    {
+        $containerField = $this->getMarcRecord()->getField('773');
+        return $this->getLinkFromField($containerField);
     }
 
     /**
@@ -746,7 +752,27 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
         } else {
             $title = false;
         }
-
+        
+        $link = $this->getLinkFromField($field);
+        
+        $pages = $field->getSubfield('g');
+        // Make sure we have something to display:
+        return ($link === false) ? false : [
+            'title' => $this->getRecordLinkNote($field),
+            'value' => $title ? $title : 'Link',
+            'link'  => $link,
+            'pages' => $pages ? $pages->getData() : ''
+        ];
+    }
+    
+    /**
+     * Extract link information from a given MARC field
+     * 
+     * @param File_MARC_Data_Field $field
+     * @return bool|array
+     */
+    protected function getLinkFromField($field)
+    {
         $linkTypeSetting = isset($this->mainConfig->Record->marc_links_link_types)
             ? $this->mainConfig->Record->marc_links_link_types
             : 'id,isbn,issn,dnb,zdb,title';
@@ -811,14 +837,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             }
         }
         
-        $pages = $field->getSubfield('g');
-        // Make sure we have something to display:
-        return !isset($link) ? false : [
-            'title' => $this->getRecordLinkNote($field),
-            'value' => $title ? $title : 'Link',
-            'link'  => $link,
-            'pages' => $pages ? $pages->getData() : ''
-        ];
+        return isset($link) ? $link : false;
     }
 
     /**
