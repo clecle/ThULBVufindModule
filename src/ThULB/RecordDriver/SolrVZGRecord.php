@@ -753,7 +753,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
             $title = false;
         }
         
-        $link = $this->getLinkFromField($field);
+        $link = $this->getLinkFromField($field, $title);
         
         $pages = $field->getSubfield('g');
         // Make sure we have something to display:
@@ -771,7 +771,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      * @param File_MARC_Data_Field $field
      * @return bool|array
      */
-    protected function getLinkFromField($field)
+    protected function getLinkFromField($field, $title = false)
     {
         $linkTypeSetting = isset($this->mainConfig->Record->marc_links_link_types)
             ? $this->mainConfig->Record->marc_links_link_types
