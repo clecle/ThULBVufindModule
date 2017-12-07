@@ -769,6 +769,7 @@ class SolrVZGRecord extends \VuFind\RecordDriver\SolrMarc
      * Extract link information from a given MARC field
      * 
      * @param File_MARC_Data_Field $field
+     * @param string $title Optional title to search for in a fallback search
      * @return bool|array
      */
     protected function getLinkFromField($field, $title = false)
