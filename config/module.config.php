@@ -58,7 +58,8 @@ $config = [
             ],
             'search_results' => [
                 'factories' => [
-                    'summon' => 'ThULB\Search\Results\Factory::getSummon'
+                    'summon' => 'ThULB\Search\Results\Factory::getSummon',
+                    'solr' => 'ThULB\Search\Results\Factory::getSolr'
                 ]
             ]
         ],

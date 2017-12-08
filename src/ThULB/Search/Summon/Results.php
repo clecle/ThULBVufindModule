@@ -10,6 +10,8 @@ use VuFind\Search\Summon\Results as OriginalResults;
  */
 class Results extends OriginalResults
 {
+    use \ThULB\Search\Results\SortedFacetsTrait;
+    
     /**
      * Get complete facet counts for several index fields. Fork of the original
      * function in VuFind\Search\Summon\Results with ored param
@@ -81,39 +83,5 @@ class Results extends OriginalResults
 
         // Send back data:
         return $ret;
-    }
-    
-    /**
-     * Returns the stored list of facets for the last search - applied ones on
-     * top
-     *
-     * @param array $filter Array of field => on-screen description listing
-     * all of the desired facet fields; set to null to get all configured values.
-     *
-     * @return array        Facets data arrays
-     */
-    public function getFacetList($filter = null)
-    {
-        $facetList = parent::getFacetList($filter);
-        
-        $sort = function ($a, $b) {
-            if ($a['isApplied'] === $b['isApplied'] && $a['count'] === $b['count']) {
-                return 0;
-            } else if ($a['isApplied'] && !$b['isApplied'] 
-                    || ($a['isApplied'] === $b['isApplied'] && $a['count'] > $b['count'])
-            ) {
-                return -1;
-            }
-            
-            return 1;
-        };
-        
-        foreach ($facetList as $facetLabel => $facetData) {
-            uasort($facetData['list'], $sort);
-            $facetData['counts'] = array_values($facetData['list']);
-            $facetData['list'] = $facetData['counts'];
-        }
-        
-        return $facetList;
     }
 }
