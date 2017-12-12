@@ -66,6 +66,9 @@ class Results extends OriginalResults
         );
 
         $facets = $collection->getFacets();
+        if (isset($facets[0]) && $facets[0]['counts']) {
+            $this->sortFacetList($facets[0]['counts']);
+        }
         $ret = [];
         foreach ($facets as $data) {
             if (in_array($data['displayName'], $facetfields)) {

@@ -22,28 +22,42 @@ trait SortedFacetsTrait
         $facetList = parent::getFacetList($filter);
         
         foreach ($facetList as $facetLabel => $facetData) {
-            // find all applied facet fields
-            $appliedFields = [];
-            foreach ($facetData['list'] as $i => $facetField) {
-                if ($facetField['isApplied']) {
-                    $facetField['fieldIndex'] = $i;
-                    $appliedFields[] = $facetField;
-                }
-            }
-            
-            // move all applied facet fields on top of their respective facet lists
-            $movedFacets = 0;
-            foreach (array_reverse($appliedFields) as $field) {
-                unset($facetData['list'][$field['fieldIndex'] + $movedFacets]);
-                array_unshift($facetData['list'], $field);
-                $movedFacets++;
-            }
-            
+            $this->sortFacetList($facetData['list']);
             $facetData['counts'] = array_values($facetData['list']);
             $facetData['list'] = $facetData['counts'];
             $facetList[$facetLabel] = $facetData;
         }
         
         return $facetList;
+    }
+    
+    /**
+     * Sorts an array of fcet fields to put all appied facets on top. All the
+     * over sorting stays the same.
+     * 
+     * @param type $facetFields array of facet fields
+     * @return boolean true
+     */
+    protected function sortFacetList(&$facetFields)
+    {
+        $facetFields = array_values($facetFields);
+        // find all applied facet fields
+        $appliedFields = [];
+        foreach ($facetFields as $i => $facetField) {
+            if ($facetField['isApplied']) {
+                $facetField['fieldIndex'] = $i;
+                $appliedFields[] = $facetField;
+            }
+        }
+
+        // move all applied facet fields on top of their respective facet lists
+        $movedFacets = 0;
+        foreach (array_reverse($appliedFields) as $field) {
+            unset($facetFields[$field['fieldIndex'] + $movedFacets]);
+            array_unshift($facetFields, $field);
+            $movedFacets++;
+        }
+        
+        return true;
     }
 }
