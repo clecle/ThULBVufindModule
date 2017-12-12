@@ -21,16 +21,24 @@ trait SortedFacetsTrait
     {
         $facetList = parent::getFacetList($filter);
         
-        $sort = function ($facetFieldA, $facetFieldB) {
-            if ($facetFieldA['isApplied'] === $facetFieldB['isApplied']) {
-                return ($facetFieldA['count'] > $facetFieldB['count']) ? -1 : 1;
+        foreach ($facetList as $facetLabel => $facetData) {
+            // find all applied facet fields
+            $appliedFields = [];
+            foreach ($facetData['list'] as $i => $facetField) {
+                if ($facetField['isApplied']) {
+                    $facetField['fieldIndex'] = $i;
+                    $appliedFields[] = $facetField;
+                }
             }
             
-            return ($facetFieldA['isApplied']) ? -1 : 1;
-        };
-        
-        foreach ($facetList as $facetLabel => $facetData) {
-            usort($facetData['list'], $sort);
+            // move all applied facet fields on top of their respective facet lists
+            $movedFacets = 0;
+            foreach (array_reverse($appliedFields) as $field) {
+                unset($facetData['list'][$field['fieldIndex'] + $movedFacets]);
+                array_unshift($facetData['list'], $field);
+                $movedFacets++;
+            }
+            
             $facetData['counts'] = array_values($facetData['list']);
             $facetData['list'] = $facetData['counts'];
             $facetList[$facetLabel] = $facetData;
