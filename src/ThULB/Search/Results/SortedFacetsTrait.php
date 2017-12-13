@@ -32,8 +32,8 @@ trait SortedFacetsTrait
     }
     
     /**
-     * Sorts an array of fcet fields to put all appied facets on top. All the
-     * over sorting stays the same.
+     * Sorts an array of facet fields to put all applied facets on top. All the
+     * other sorting stays the same.
      * 
      * @param type $facetFields array of facet fields
      * @return boolean true
