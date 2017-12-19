@@ -64,4 +64,22 @@ class Summon extends OriginalSummon
         }
         return $str;
     }
+
+    /**
+     * Get an array of all corporate authors.
+     *
+     * @return array
+     */
+    public function getCorporateAuthors()
+    {
+        $authors = [];
+        if (isset($this->fields['CorporateAuthor_xml'])) {
+            for ($i = 0; $i < count($this->fields['CorporateAuthor_xml']); $i++) {
+                if (isset($this->fields['CorporateAuthor_xml'][$i]['name'])) {
+                    $authors[] = $this->fields['CorporateAuthor_xml'][$i]['name'];
+                }
+            }
+        }
+        return $authors;
+    }
 }
